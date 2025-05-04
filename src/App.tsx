@@ -1,6 +1,7 @@
-import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import Chat from './pages/Chat';
 import ImageExplainer from './pages/ImageExplainer';
+import PromptEngineer from './pages/PromptEngineer';
 
   /**
    * The main App component. This component renders a `Router` with routes
@@ -49,7 +50,8 @@ function App() {
         {/* <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8"> */}
           <Routes>
             <Route path="/" element={<Chat />} />
-            <Route path="/" element={<ImageExplainer />} />
+            <Route path="/image-explainer" element={<ImageExplainer />} />
+            <Route path="/prompt-engineer" element={<PromptEngineer />} />
           </Routes>
         {/* </main> */}
       {/* </div> */}
