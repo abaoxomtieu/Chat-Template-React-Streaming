@@ -1,9 +1,10 @@
 import React, { useState, useRef, useEffect } from "react";
-import { Input, Switch } from "antd";
+import { Avatar, Input, Switch } from "antd";
 import {
   SendOutlined,
   DeleteOutlined,
   ThunderboltOutlined,
+  RobotOutlined,
 } from "@ant-design/icons";
 import ChatMessage from "./ChatMessage";
 import {
@@ -12,6 +13,7 @@ import {
   sendPrimaryChatMessage,
   sendStreamingChatMessage,
 } from "../services/chatService";
+import ReactMarkdown from "react-markdown";
 
 const { TextArea } = Input;
 const CHAT_HISTORY_KEY = "chat_history";
@@ -306,9 +308,25 @@ const ChatContainer: React.FC = () => {
             {messages.map((message, index) => (
               <ChatMessage key={index} message={message} />
             ))}
+            {/* Streaming message with same styling as ChatMessage */}
             {streamingMessage && (
-              <div className="p-4 bg-gray-50 rounded-lg">
-                <div className="text-gray-600">{streamingMessage}</div>
+              <div className="flex justify-center">
+                <div className="py-4 w-2/3 rounded-2xl bg-gray-100">
+                  <div className="max-w-3xl mx-auto flex gap-4 px-4">
+                    <Avatar
+                      icon={<RobotOutlined />}
+                      className="bg-blue-500 text-white"
+                      size={32}
+                    />
+                    <div className="flex-1 text-gray-800 text-sm leading-relaxed">
+                      <div className="w-full">
+                        <ReactMarkdown>
+                          {streamingMessage.replace(/\n/g, "  \n")}
+                        </ReactMarkdown>
+                      </div>
+                    </div>
+                  </div>
+                </div>
               </div>
             )}
             {loading && (
