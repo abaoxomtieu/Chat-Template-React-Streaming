@@ -1,7 +1,7 @@
 import { PrimaryChatPayload, StreamResponse } from "./chatService";
 
 // API URLs
-const BASE_API_URL = "http://0.0.0.0:8000/ai";
+const BASE_API_URL = "http://localhost:8000/ai";
 const PROMPT_ENGINEER_URL = `${BASE_API_URL}/prompt_engineer`;
 const PROMPT_ENGINEER_STREAM_URL = `${BASE_API_URL}/prompt_engineer/stream`;
 

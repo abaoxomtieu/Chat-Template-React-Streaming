@@ -2,6 +2,7 @@ import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import Chat from './pages/Chat';
 import ImageExplainer from './pages/ImageExplainer';
 import PromptEngineer from './pages/PromptEngineer';
+import AdaptiveChat from './pages/AdaptiveChat';
 
   /**
    * The main App component. This component renders a `Router` with routes
@@ -52,6 +53,7 @@ function App() {
             <Route path="/" element={<Chat />} />
             <Route path="/image-explainer" element={<ImageExplainer />} />
             <Route path="/prompt-engineer" element={<PromptEngineer />} />
+            <Route path="/adaptive-chat" element={<AdaptiveChat />} />
           </Routes>
         {/* </main> */}
       {/* </div> */}
