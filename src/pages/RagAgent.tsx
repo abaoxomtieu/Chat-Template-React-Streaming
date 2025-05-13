@@ -20,7 +20,8 @@ import {
   PictureOutlined,
   CloseCircleOutlined,
 } from "@ant-design/icons";
-import ChatMessage from "../components/ChatMessage";
+// import ChatMessage from "../components/ChatMessage";
+import ChatMessageAgent from "../components/ChatMessageAgent";
 import { ChatMessage as ChatMessageType } from "../services/chatService";
 import {
   RagAgentPayload,
@@ -34,7 +35,17 @@ const { Panel } = Collapse;
 const CHAT_HISTORY_KEY = "rag_agent_chat_history";
 
 const RagAgent: React.FC = () => {
-  const [messages, setMessages] = useState<ChatMessageType[]>(() => {
+  // Define a new type for structured messages that includes role-based format
+  interface StructuredMessage {
+    role: string;
+    content: string | Array<{type: string; text?: string; source_type?: string; url?: string}>;
+    // Keep the original type for backward compatibility with UI components
+    type?: string;
+    // For display purposes only
+    displayContent?: string;
+  }
+
+  const [messages, setMessages] = useState<StructuredMessage[]>(() => {
     // Load chat history from localStorage on initial render
     const savedMessages = localStorage.getItem(CHAT_HISTORY_KEY);
     if (savedMessages) {
@@ -108,6 +119,7 @@ const RagAgent: React.FC = () => {
           if (typeof finalData === "object" && "final_response" in finalData) {
             // Process response to include image URLs from selected documents
             let responseContent = finalData.final_response;
+            let contentForApi = responseContent;
 
             // Check for images in selected documents and include them in the response
             const imageDocuments = (finalData.selected_documents || []).filter(
@@ -117,6 +129,14 @@ const RagAgent: React.FC = () => {
                 doc.metadata.type === "image"
             );
 
+            // Structure for storing images in the API format
+            const contentItems = [];
+
+            // If there's text content, add it first
+            if (responseContent) {
+              contentItems.push({ type: "text", text: responseContent });
+            }
+
             // Append image URLs to the response if they exist
             if (imageDocuments.length > 0) {
               // If there's a reference to [Image] without a URL in the response, replace it
@@ -125,20 +145,31 @@ const RagAgent: React.FC = () => {
                 responseContent.includes("[image]")
               ) {
                 imageDocuments.forEach((doc) => {
-                  // Replace both [Image] and [image] with proper markdown image syntax
+                  // Replace both [Image] and [image] with proper markdown image syntax for display
                   responseContent = responseContent.replace(
                     /\[Image\]/i,
-                    `\n![image](${doc.metadata.public_url})`
+                    `![image]\n(${doc.metadata.public_url})`
                   );
+
+                  // Add image to content items for API
+                  contentItems.push({
+                    type: "image",
+                    source_type: "url",
+                    url: doc.metadata.public_url,
+                  });
                 });
               }
             }
 
-            const aiMessage: ChatMessageType = {
-              content: responseContent,
+            // Create a structured message with both display and API formats
+            const aiMessage: StructuredMessage = {
+              role: "assistant",
+              content: contentItems.length > 1 ? contentItems : contentForApi,
               type: "ai",
+              displayContent: responseContent,
             };
-            setMessages((prev) => [...prev, aiMessage]);
+
+            setMessages((prev) => [...prev, aiMessage] as StructuredMessage[]);
             setSelectedDocuments(finalData.selected_documents || []);
             setLoading(false);
           }
@@ -148,11 +179,13 @@ const RagAgent: React.FC = () => {
           setLoading(false);
           setStreamingMessage("");
           // Add error message
-          const errorMessage: ChatMessageType = {
+          const errorMessage: StructuredMessage = {
+            role: "assistant",
             content: `Error: ${error}`,
             type: "ai",
+            displayContent: `Error: ${error}`,
           };
-          setMessages((prev) => [...prev, errorMessage]);
+          setMessages((prev) => [...prev, errorMessage] as StructuredMessage[]);
         }
       );
     } catch (error) {
@@ -167,6 +200,7 @@ const RagAgent: React.FC = () => {
 
       // Process response to include image URLs from selected documents
       let responseContent = response.final_response;
+      let contentForApi = responseContent;
 
       // Check for images in selected documents and include them in the response
       const imageDocuments = (response.selected_documents || []).filter(
@@ -176,6 +210,14 @@ const RagAgent: React.FC = () => {
           doc.metadata.type === "image"
       );
 
+      // Structure for storing images in the API format
+      const contentItems = [];
+
+      // If there's text content, add it first
+      if (responseContent) {
+        contentItems.push({ type: "text", text: responseContent });
+      }
+
       // Append image URLs to the response if they exist
       if (imageDocuments.length > 0) {
         // If there's a reference to [Image] without a URL in the response, replace it
@@ -184,21 +226,31 @@ const RagAgent: React.FC = () => {
           responseContent.includes("[image]")
         ) {
           imageDocuments.forEach((doc) => {
-            // Replace both [Image] and [image] with proper markdown image syntax
+            // Replace both [Image] and [image] with proper markdown image syntax for display
             responseContent = responseContent.replace(
               /\[Image\]/i,
-              `\n![image](${doc.metadata.public_url})`
+              `![image]\n(${doc.metadata.public_url})`
             );
+
+            // Add image to content items for API
+            contentItems.push({
+              type: "image",
+              source_type: "url",
+              url: doc.metadata.public_url,
+            });
           });
         }
       }
 
-      const aiMessage: ChatMessageType = {
-        content: responseContent,
+      // Create a structured message with both display and API formats
+      const aiMessage: StructuredMessage = {
+        role: "assistant",
+        content: contentItems.length > 1 ? contentItems : contentForApi,
         type: "ai",
+        displayContent: responseContent,
       };
 
-      setMessages((prev) => [...prev, aiMessage]);
+      setMessages((prev) => [...prev, aiMessage] as StructuredMessage[]);
       setSelectedDocuments(response.selected_documents || []);
       setLoading(false);
     } catch (error) {
@@ -206,13 +258,17 @@ const RagAgent: React.FC = () => {
       setLoading(false);
 
       // Add error message
-      const errorMessage: ChatMessageType = {
+      const errorMessage: StructuredMessage = {
+        role: "assistant",
         content: `Error: ${
           error instanceof Error ? error.message : "Unknown error"
         }`,
         type: "ai",
+        displayContent: `Error: ${
+          error instanceof Error ? error.message : "Unknown error"
+        }`,
       };
-      setMessages((prev) => [...prev, errorMessage]);
+      setMessages((prev) => [...prev, errorMessage] as StructuredMessage[]);
     }
   };
 
@@ -240,27 +296,51 @@ const RagAgent: React.FC = () => {
   const handleSend = async () => {
     if ((!input.trim() && !selectedImage) || loading) return;
 
-    // Add user message to chat
-    const userMessage: ChatMessageType = {
+    // Format the query text
+    const queryText = input || (selectedImage ? "Hình này là gì?" : "");
+
+    // Create a structured message that includes both role-based format and display format
+    const userMessage: StructuredMessage = {
+      // Role-based format for API
+      role: "user",
       content: selectedImage
-        ? `${input || "Hình này là gì?"}\n![image](${selectedImage})`
-        : input,
+        ? [
+            { type: "text", text: queryText },
+            { type: "image", source_type: "url", url: selectedImage },
+          ]
+        : queryText,
+      // Original type for backward compatibility
       type: "human",
+      // Display content for UI rendering (only used for display)
+      displayContent: selectedImage
+        ? `${queryText}\n![image](${selectedImage})`
+        : queryText,
     };
-    setMessages((prev) => [...prev, userMessage]);
+
+    setMessages((prev) => [...prev, userMessage] as StructuredMessage[]);
     setInput("");
     setLoading(true);
 
-    // Prepare payload
-    const payload: RagAgentPayload = {
-      query: input || (selectedImage ? "Hình này là gì?" : ""),
-      history: messages,
-    };
+    // No need to convert history since we're already storing in the correct format
+    // Just map to ensure we only send the fields the API expects
+    const convertedHistory = messages.map((msg) => ({
+      role: msg.role,
+      content: msg.content,
+    }));
 
-    // Add image URL if an image is selected
-    if (selectedImage) {
-      payload.image_url = selectedImage;
-    }
+    // Prepare payload with role-based format
+    const payload: RagAgentPayload = {
+      query: {
+        role: "user",
+        content: selectedImage
+          ? [
+              { type: "text", text: queryText },
+              { type: "image", source_type: "url", url: selectedImage },
+            ]
+          : queryText,
+      },
+      history: convertedHistory,
+    };
 
     // Handle chat based on streaming preference
     if (isStreaming) {
@@ -405,61 +485,46 @@ const RagAgent: React.FC = () => {
               </div>
             </div>
           ) : (
-            <></>
+            messages.map((msg: StructuredMessage, index: number) => {
+              // Use the structured message directly with ChatMessageAgent
+              // If displayContent is available, use it for rendering, otherwise use content
+              const displayMessage = {
+                role: msg.role,
+                content: msg.displayContent || (typeof msg.content === 'string' ? msg.content : ''),
+              };
+
+              return <ChatMessageAgent key={index} message={displayMessage} />;
+            })
           )}
 
           {/* Streaming message */}
-          <div className="flex-1 overflow-y-auto custom-scrollbar py-4">
-            <div className="space-y-4">
-              {messages.map((message, index) => (
-                <ChatMessage key={index} message={message} />
-              ))}
-              {/* Streaming message with same styling as ChatMessage */}
-              {streamingMessage && (
-                <div className="flex justify-center">
-                  <div className="py-4 w-2/3 rounded-2xl bg-gray-100">
-                    <div className="max-w-3xl mx-auto flex gap-4 px-4">
-                      <Avatar
-                        icon={<RobotOutlined />}
-                        className="bg-blue-500 text-white"
-                        size={32}
-                      />
-                      <div className="flex-1 text-gray-800 text-sm leading-relaxed">
-                        <div className="w-full">
-                          <ReactMarkdown>
-                            {streamingMessage.replace(/\n/g, "  \n")}
-                          </ReactMarkdown>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              )}
-              {loading && (
-                <div className="flex justify-center my-6">
-                  <div className="flex items-center space-x-3 px-4 py-2 bg-white/80 backdrop-blur-sm rounded-full shadow-sm border border-purple-100">
-                    <div className="w-5 h-5 rounded-full bg-gradient-to-r from-purple-600 to-indigo-600 animate-pulse" />
-                    <div className="text-gray-600 font-medium">
-                      AI is thinking
-                    </div>
-                    <div className="flex space-x-1">
-                      {[0, 1, 2].map((dot) => (
-                        <div
-                          key={dot}
-                          className="h-2 w-2 bg-purple-600 rounded-full animate-bounce"
-                          style={{
-                            animationDelay: `${dot * 0.2}s`,
-                            animationDuration: "1s",
-                          }}
+          {streamingMessage && (
+            <div className="bg-gray-100 rounded-2xl py-4 animate-pulse">
+              <div className="max-w-3xl mx-auto flex gap-4 px-4">
+                <Avatar
+                  icon={<RobotOutlined />}
+                  className="bg-blue-500 text-white"
+                  size={32}
+                />
+                <div className="flex-1 text-gray-800 text-sm leading-relaxed">
+                  <ReactMarkdown
+                    components={{
+                      img: ({ node, src, alt, ...props }) => (
+                        <img
+                          src={src}
+                          alt={alt || "Image"}
+                          className="my-2 max-w-full rounded-md"
+                          {...props}
                         />
-                      ))}
-                    </div>
-                  </div>
+                      ),
+                    }}
+                  >
+                    {streamingMessage}
+                  </ReactMarkdown>
                 </div>
-              )}
-              <div ref={messagesEndRef} />
+              </div>
             </div>
-          </div>
+          )}
 
           {/* Source documents */}
           {selectedDocuments.length > 0 && (

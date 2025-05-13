@@ -1,11 +1,29 @@
 import axios from "axios";
-import { ChatMessage } from "./chatService";
 
 // RAG Agent payload that matches the backend RagAgentBody
 export interface RagAgentPayload {
-  query: string;
-  history: ChatMessage[];
-  image_url?: string; // Optional image URL for image-based queries
+  query: {
+    role: string;
+    content:
+      | string
+      | Array<{
+          type: string;
+          text?: string;
+          source_type?: string;
+          url?: string;
+        }>;
+  };
+  history: Array<{
+    role: string;
+    content:
+      | string
+      | Array<{
+          type: string;
+          text?: string;
+          source_type?: string;
+          url?: string;
+        }>;
+  }>;
 }
 
 // Response structure for RAG Agent
@@ -18,11 +36,13 @@ export interface RagAgentResponse {
 // Stream response types for RAG Agent
 export interface RagStreamResponse {
   type: "message" | "error" | "final";
-  content: string | {
-    final_response: string;
-    selected_ids: number[];
-    selected_documents: any[];
-  };
+  content:
+    | string
+    | {
+        final_response: string;
+        selected_ids: number[];
+        selected_documents: any[];
+      };
 }
 
 // API URLs
@@ -58,9 +78,9 @@ export const sendStreamingRagAgentMessage = async (
 ) => {
   try {
     const response = await fetch(RAG_AGENT_STREAM_URL, {
-      method: 'POST',
+      method: "POST",
       headers: {
-        'Content-Type': 'application/json',
+        "Content-Type": "application/json",
       },
       body: JSON.stringify(payload),
     });
@@ -73,42 +93,42 @@ export const sendStreamingRagAgentMessage = async (
     const decoder = new TextDecoder();
 
     if (!reader) {
-      throw new Error('No reader available');
+      throw new Error("No reader available");
     }
 
-    let buffer = '';
+    let buffer = "";
     while (true) {
       const { value, done } = await reader.read();
       if (done) break;
-      
+
       buffer += decoder.decode(value, { stream: true });
-      const lines = buffer.split('\n\n');
-      buffer = lines.pop() || '';
-      
+      const lines = buffer.split("\n\n");
+      buffer = lines.pop() || "";
+
       for (const line of lines) {
         if (line.trim()) {
           try {
             const data: RagStreamResponse = JSON.parse(line);
             console.log("Stream data:", data);
             switch (data.type) {
-              case 'message':
+              case "message":
                 onMessage(data.content as string);
                 break;
-              case 'final':
+              case "final":
                 onFinal(data.content);
                 break;
-              case 'error':
+              case "error":
                 onError(data.content as string);
                 break;
             }
           } catch (e) {
-            console.error('Error parsing stream data:', e);
+            console.error("Error parsing stream data:", e);
           }
         }
       }
     }
   } catch (error) {
-    console.error('Error in streaming RAG agent:', error);
-    onError(error instanceof Error ? error.message : 'Unknown error');
+    console.error("Error in streaming RAG agent:", error);
+    onError(error instanceof Error ? error.message : "Unknown error");
   }
 };
