@@ -52,3 +52,31 @@ export default tseslint.config({
   },
 })
 ```
+
+## Adaptive Chat Feature
+
+The application now includes an Adaptive Chat feature that connects to the Custom-AI adaptive chatbot. This feature provides:
+
+1. **User Profile Tracking** - The chatbot remembers user preferences and adapts over time
+2. **Probing Questions** - The chatbot can ask follow-up questions to gather more information
+3. **Streaming Support** - Real-time message streaming for a better user experience
+
+### Accessing Adaptive Chat
+
+Navigate to `/adaptive-chat` in your browser after starting the application.
+
+### Connecting to Custom-AI Backend
+
+The Adaptive Chat feature requires the Custom-AI backend to be running. Make sure to:
+
+1. Start the Custom-AI backend server:
+   ```
+   cd ../Custom-AI
+   python app.py
+   ```
+
+2. Ensure the adaptive-chat endpoints are accessible at `http://localhost:8000/adaptive-chat`
+
+### User Profile
+
+The adaptive chat feature automatically builds and updates a user profile based on interactions. This profile is used to tailor responses to the user's needs and preferences over time.

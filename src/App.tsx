@@ -1,21 +1,22 @@
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import Chat from './pages/Chat';
-import ImageExplainer from './pages/ImageExplainer';
-import PromptEngineer from './pages/PromptEngineer';
-import RagAgent from './pages/RagAgent';
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import Chat from "./pages/Chat";
+import ImageExplainer from "./pages/ImageExplainer";
+import PromptEngineer from "./pages/PromptEngineer";
+import RagAgent from "./pages/RagAgent";
+import AdaptiveChat from "./pages/AdaptiveChat";
 
-  /**
-   * The main App component. This component renders a `Router` with routes
-   * to the `Chat` and `ImageExplainer` pages.
-   *
-   * This component is the entry point for the entire application.
-   *
-   * @remarks
-   * This component is a functional component and does not have its own state.
-   * All state is managed by the `Chat` and `ImageExplainer` components.
-   *
-   * @returns {JSX.Element} The rendered App component.
-   */
+/**
+ * The main App component. This component renders a `Router` with routes
+ * to the `Chat` and `ImageExplainer` pages.
+ *
+ * This component is the entry point for the entire application.
+ *
+ * @remarks
+ * This component is a functional component and does not have its own state.
+ * All state is managed by the `Chat` and `ImageExplainer` components.
+ *
+ * @returns {JSX.Element} The rendered App component.
+ */
 function App() {
   return (
     <Router>
@@ -48,14 +49,15 @@ function App() {
           </div>
         </nav> */}
 
-        {/* <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8"> */}
-          <Routes>
-            <Route path="/" element={<Chat />} />
-            <Route path="/image-explainer" element={<ImageExplainer />} />
-            <Route path="/prompt-engineer" element={<PromptEngineer />} />
-            <Route path="/rag-agent" element={<RagAgent />} />
-          </Routes>
-        {/* </main> */}
+      {/* <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8"> */}
+      <Routes>
+        <Route path="/" element={<Chat />} />
+        <Route path="/image-explainer" element={<ImageExplainer />} />
+        <Route path="/prompt-engineer" element={<PromptEngineer />} />
+        <Route path="/rag-agent" element={<RagAgent />} />
+        <Route path="/adaptive-chat" element={<AdaptiveChat />} />
+      </Routes>
+      {/* </main> */}
       {/* </div> */}
     </Router>
   );
