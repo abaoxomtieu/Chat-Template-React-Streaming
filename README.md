@@ -80,3 +80,4 @@ The Adaptive Chat feature requires the Custom-AI backend to be running. Make sur
 ### User Profile
 
 The adaptive chat feature automatically builds and updates a user profile based on interactions. This profile is used to tailor responses to the user's needs and preferences over time.
+![image](https://res.cloudinary.com/deb6egoxo/image/upload/v1747107755/robokki_images/762612d5-6854-4afa-96a2-547a51c932ab.png)

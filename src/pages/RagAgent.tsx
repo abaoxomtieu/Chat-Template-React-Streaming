@@ -106,8 +106,36 @@ const RagAgent: React.FC = () => {
         }) => {
           setStreamingMessage("");
           if (typeof finalData === "object" && "final_response" in finalData) {
+            // Process response to include image URLs from selected documents
+            let responseContent = finalData.final_response;
+
+            // Check for images in selected documents and include them in the response
+            const imageDocuments = (finalData.selected_documents || []).filter(
+              (doc) =>
+                doc.metadata &&
+                doc.metadata.public_url &&
+                doc.metadata.type === "image"
+            );
+
+            // Append image URLs to the response if they exist
+            if (imageDocuments.length > 0) {
+              // If there's a reference to [Image] without a URL in the response, replace it
+              if (
+                responseContent.includes("[Image]") ||
+                responseContent.includes("[image]")
+              ) {
+                imageDocuments.forEach((doc) => {
+                  // Replace both [Image] and [image] with proper markdown image syntax
+                  responseContent = responseContent.replace(
+                    /\[Image\]/i,
+                    `\n![image](${doc.metadata.public_url})`
+                  );
+                });
+              }
+            }
+
             const aiMessage: ChatMessageType = {
-              content: finalData.final_response,
+              content: responseContent,
               type: "ai",
             };
             setMessages((prev) => [...prev, aiMessage]);
@@ -137,8 +165,36 @@ const RagAgent: React.FC = () => {
     try {
       const response = await sendRagAgentMessage(payload);
 
+      // Process response to include image URLs from selected documents
+      let responseContent = response.final_response;
+
+      // Check for images in selected documents and include them in the response
+      const imageDocuments = (response.selected_documents || []).filter(
+        (doc) =>
+          doc.metadata &&
+          doc.metadata.public_url &&
+          doc.metadata.type === "image"
+      );
+
+      // Append image URLs to the response if they exist
+      if (imageDocuments.length > 0) {
+        // If there's a reference to [Image] without a URL in the response, replace it
+        if (
+          responseContent.includes("[Image]") ||
+          responseContent.includes("[image]")
+        ) {
+          imageDocuments.forEach((doc) => {
+            // Replace both [Image] and [image] with proper markdown image syntax
+            responseContent = responseContent.replace(
+              /\[Image\]/i,
+              `\n![image](${doc.metadata.public_url})`
+            );
+          });
+        }
+      }
+
       const aiMessage: ChatMessageType = {
-        content: response.final_response,
+        content: responseContent,
         type: "ai",
       };
 
@@ -186,7 +242,9 @@ const RagAgent: React.FC = () => {
 
     // Add user message to chat
     const userMessage: ChatMessageType = {
-      content: selectedImage ? `${input || "Hình này là gì?"} [Image]` : input,
+      content: selectedImage
+        ? `${input || "Hình này là gì?"}\n![image](${selectedImage})`
+        : input,
       type: "human",
     };
     setMessages((prev) => [...prev, userMessage]);
@@ -347,25 +405,61 @@ const RagAgent: React.FC = () => {
               </div>
             </div>
           ) : (
-            messages.map((message, index) => (
-              <ChatMessage key={index} message={message} />
-            ))
+            <></>
           )}
 
           {/* Streaming message */}
-          {streamingMessage && (
-            <div className="flex items-start gap-3">
-              <Avatar
-                icon={<RobotOutlined />}
-                className="bg-gradient-to-r from-purple-600 to-indigo-600 text-white flex-shrink-0 mt-1"
-              />
-              <div className="flex-1 bg-white rounded-xl p-4 shadow-sm border border-purple-100">
-                <div className="prose max-w-none">
-                  <ReactMarkdown>{streamingMessage}</ReactMarkdown>
+          <div className="flex-1 overflow-y-auto custom-scrollbar py-4">
+            <div className="space-y-4">
+              {messages.map((message, index) => (
+                <ChatMessage key={index} message={message} />
+              ))}
+              {/* Streaming message with same styling as ChatMessage */}
+              {streamingMessage && (
+                <div className="flex justify-center">
+                  <div className="py-4 w-2/3 rounded-2xl bg-gray-100">
+                    <div className="max-w-3xl mx-auto flex gap-4 px-4">
+                      <Avatar
+                        icon={<RobotOutlined />}
+                        className="bg-blue-500 text-white"
+                        size={32}
+                      />
+                      <div className="flex-1 text-gray-800 text-sm leading-relaxed">
+                        <div className="w-full">
+                          <ReactMarkdown>
+                            {streamingMessage.replace(/\n/g, "  \n")}
+                          </ReactMarkdown>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
                 </div>
-              </div>
+              )}
+              {loading && (
+                <div className="flex justify-center my-6">
+                  <div className="flex items-center space-x-3 px-4 py-2 bg-white/80 backdrop-blur-sm rounded-full shadow-sm border border-purple-100">
+                    <div className="w-5 h-5 rounded-full bg-gradient-to-r from-purple-600 to-indigo-600 animate-pulse" />
+                    <div className="text-gray-600 font-medium">
+                      AI is thinking
+                    </div>
+                    <div className="flex space-x-1">
+                      {[0, 1, 2].map((dot) => (
+                        <div
+                          key={dot}
+                          className="h-2 w-2 bg-purple-600 rounded-full animate-bounce"
+                          style={{
+                            animationDelay: `${dot * 0.2}s`,
+                            animationDuration: "1s",
+                          }}
+                        />
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              )}
+              <div ref={messagesEndRef} />
             </div>
-          )}
+          </div>
 
           {/* Source documents */}
           {selectedDocuments.length > 0 && (

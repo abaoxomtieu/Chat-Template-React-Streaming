@@ -14,7 +14,11 @@ const ChatMessage: React.FC<{ message: ChatMessageType }> = ({ message }) => {
 
   return (
     <div className="flex justify-center">
-      <div className={`py-4 w-2/3 rounded-2xl ${isAI ? "bg-gray-100" : "bg-white "}`}>
+      <div
+        className={`py-4 w-2/3 rounded-2xl ${
+          isAI ? "bg-gray-100" : "bg-white"
+        }`}
+      >
         <div className="max-w-3xl mx-auto flex gap-4 px-4">
           <Avatar
             icon={isAI ? <RobotOutlined /> : <UserOutlined />}
@@ -22,13 +26,23 @@ const ChatMessage: React.FC<{ message: ChatMessageType }> = ({ message }) => {
             size={32}
           />
           <div className="flex-1 text-gray-800 text-sm leading-relaxed">
-            {isAI ? (
-              <div className="w-full">
-                <ReactMarkdown>{formatContent(message.content)}</ReactMarkdown>
-              </div>
-            ) : (
-              <div className="whitespace-pre-line">{message.content}</div>
-            )}
+            <div className="w-full">
+              <ReactMarkdown
+                components={{
+                  // This custom renderer ensures images are displayed properly
+                  img: ({ node, src, alt, ...props }) => (
+                    <img
+                      src={src}
+                      alt={alt || "Image"}
+                      className="my-2 max-w-full rounded-md"
+                      {...props}
+                    />
+                  ),
+                }}
+              >
+                {formatContent(message.content)}
+              </ReactMarkdown>
+            </div>
           </div>
         </div>
       </div>
