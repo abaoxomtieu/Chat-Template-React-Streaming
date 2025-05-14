@@ -90,36 +90,83 @@ export const sendStreamingChatMessage = async (
     }
 
     let buffer = '';
+    let jsonBuffer = '';
+    let inJson = false;
+    
     while (true) {
       const { value, done } = await reader.read();
       if (done) break;
-      console.log("value", value);
+      
       buffer += decoder.decode(value, { stream: true });
-      console.log("buffer", buffer);
-      const lines = buffer.split('\n\n');
-      buffer = lines.pop() || '';
-      console.log("lines", lines);
-      for (const line of lines) {
-        if (line.trim()) {
-          try {
-            const data: StreamResponse = JSON.parse(line);
-            console.log("Stream data:", data);
-            switch (data.type) {
-              case 'message':
-                onMessage(data.content as string);
-                break;
-              case 'final':
-                onFinal(data.content);
-                break;
-              case 'error':
-                onError(data.content as string);
-                break;
+      
+      // Process each character to handle JSON objects without relying on delimiters
+      for (let i = 0; i < buffer.length; i++) {
+        const char = buffer[i];
+        
+        if (!inJson && char === '{') {
+          // Start of a new JSON object
+          inJson = true;
+          jsonBuffer = '{';
+        } else if (inJson) {
+          jsonBuffer += char;
+          
+          // Check if we have a complete JSON object
+          if (char === '}') {
+            try {
+              // Try to parse the JSON to see if it's valid
+              const data: StreamResponse = JSON.parse(jsonBuffer);
+              console.log("Stream data:", data);
+              
+              switch (data.type) {
+                case 'message':
+                  onMessage(data.content as string);
+                  break;
+                case 'final':
+                  onFinal(data.content);
+                  break;
+                case 'error':
+                  onError(data.content as string);
+                  break;
+              }
+              
+              // Reset for the next JSON object
+              inJson = false;
+              jsonBuffer = '';
+            } catch (e) {
+              // If parsing fails, it might be an incomplete JSON object or malformed
+              // Continue collecting more characters
+              if (jsonBuffer.endsWith('}}')) {
+                // This might be a nested object that's complete
+                try {
+                  const data: StreamResponse = JSON.parse(jsonBuffer);
+                  console.log("Stream data (nested):", data);
+                  
+                  switch (data.type) {
+                    case 'message':
+                      onMessage(data.content as string);
+                      break;
+                    case 'final':
+                      onFinal(data.content);
+                      break;
+                    case 'error':
+                      onError(data.content as string);
+                      break;
+                  }
+                  
+                  // Reset for the next JSON object
+                  inJson = false;
+                  jsonBuffer = '';
+                } catch (nestedError) {
+                  // Still not a valid JSON, continue collecting
+                }
+              }
             }
-          } catch (e) {
-            console.error('Error parsing stream data:', e);
           }
         }
       }
+      
+      // Clear the processed buffer
+      buffer = '';
     }
   } catch (error) {
     console.error('Error in streaming chat:', error);
