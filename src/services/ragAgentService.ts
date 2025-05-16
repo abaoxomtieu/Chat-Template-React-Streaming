@@ -1,4 +1,5 @@
 import axios from "axios";
+import { ApiDomain } from "../constants";
 
 // RAG Agent payload that matches the backend RagAgentBody
 export interface RagAgentPayload {
@@ -35,7 +36,7 @@ export interface RagStreamResponse {
 }
 
 // API URLs
-const BASE_API_URL = "http://0.0.0.0:8000/ai";
+const BASE_API_URL = `${ApiDomain}/ai`;
 const RAG_AGENT_URL = `${BASE_API_URL}/rag_agent_template`;
 const RAG_AGENT_STREAM_URL = `${BASE_API_URL}/rag_agent_template/stream`;
 

@@ -1,4 +1,5 @@
 import axios from "axios";
+import { ApiDomain } from "../constants";
 
 export interface ChatMessage {
   content: string;
@@ -27,7 +28,7 @@ export interface ChatPayload {
 }
 
 // API URLs
-const BASE_API_URL = "http://localhost:8000/ai";
+const BASE_API_URL = `${ApiDomain}/ai`;
 const PRIMARY_CHAT_URL = `${BASE_API_URL}/primary_chat`;
 const PRIMARY_CHAT_STREAM_URL = `${BASE_API_URL}/primary_chat/stream`;
 const RAG_SPEED_URL = `${BASE_API_URL}/rag_speed`; // Legacy endpoint

@@ -10,6 +10,7 @@ import {
   Image,
   Modal,
   List,
+  message,
 } from "antd";
 import {
   SendOutlined,
@@ -20,6 +21,7 @@ import {
   PictureOutlined,
   CloseCircleOutlined,
 } from "@ant-design/icons";
+import FileUploadButton from "../components/FileUploadButton";
 // import ChatMessage from "../components/ChatMessage";
 import ChatMessageAgent from "../components/ChatMessageAgent";
 import { ChatMessage as ChatMessageType } from "../services/chatService";
@@ -66,6 +68,7 @@ const RagAgent: React.FC = () => {
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
   const [isImageModalVisible, setIsImageModalVisible] = useState(false);
   const [availableImages, setAvailableImages] = useState<any[]>([]);
+  const [botId, setBotId] = useState<string>("1"); // Default bot ID
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   // Save messages to localStorage whenever they change
@@ -491,28 +494,32 @@ const RagAgent: React.FC = () => {
 
           {/* Streaming message */}
           {streamingMessage && (
-            <div className="bg-gray-100 rounded-2xl py-4 animate-pulse">
-              <div className="max-w-3xl mx-auto flex gap-4 px-4">
-                <Avatar
-                  icon={<RobotOutlined />}
-                  className="bg-blue-500 text-white"
-                  size={32}
-                />
-                <div className="flex-1 text-gray-800 text-sm leading-relaxed">
-                  <ReactMarkdown
-                    components={{
-                      img: ({ node, src, alt, ...props }) => (
-                        <img
-                          src={src}
-                          alt={alt || "Image"}
-                          className="my-2 max-w-full rounded-md"
-                          {...props}
-                        />
-                      ),
-                    }}
-                  >
-                    {streamingMessage}
-                  </ReactMarkdown>
+            <div className="flex justify-center">
+              <div className="bg-gray-100 rounded-2xl py-4 w-2/3 animate-pulse">
+                <div className="max-w-3xl mx-auto flex gap-4 px-4">
+                  <Avatar
+                    icon={<RobotOutlined />}
+                    className="bg-blue-500 text-white"
+                    size={32}
+                  />
+                  <div className="flex-1 text-gray-800 text-sm leading-relaxed">
+                    <div className="w-full">
+                      <ReactMarkdown
+                        components={{
+                          img: ({ node, src, alt, ...props }) => (
+                            <img
+                              src={src}
+                              alt={alt || "Image"}
+                              className="my-2 max-w-full rounded-md"
+                              {...props}
+                            />
+                          ),
+                        }}
+                      >
+                        {streamingMessage}
+                      </ReactMarkdown>
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>
@@ -590,6 +597,14 @@ const RagAgent: React.FC = () => {
                 <ThunderboltOutlined />
                 Streaming {isStreaming ? "On" : "Off"}
               </span>
+              
+              <FileUploadButton 
+                botId={botId}
+                onUploadSuccess={(result) => {
+                  // Refresh the chat or show a notification
+                  message.success(`Successfully processed ${result.file_path} with ${result.chunks_count} chunks`);
+                }}
+              />
             </div>
             {availableImages.length > 0 && (
               <Button

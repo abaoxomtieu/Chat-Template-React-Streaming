@@ -1,4 +1,5 @@
 import axios from "axios";
+import { ApiDomain } from "../constants";
 
 export interface ChatMessage {
   content: string;
@@ -33,7 +34,7 @@ export interface StreamResponse {
 }
 
 // API URLs
-const BASE_API_URL = "http://localhost:8000/adaptive-chat";
+const BASE_API_URL = `${ApiDomain}/adaptive-chat`;
 const ADAPTIVE_CHAT_URL = `${BASE_API_URL}/chat`;
 const ADAPTIVE_CHAT_STREAM_URL = `${BASE_API_URL}/chat/stream`;
 
