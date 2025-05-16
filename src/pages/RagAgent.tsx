@@ -298,7 +298,7 @@ const RagAgent: React.FC = () => {
 
     // Format the query text
     const queryText = input || (selectedImage ? "Hình này là gì?" : "");
-
+    clearSelectedImage()
     // Create a structured message that includes both role-based format and display format
     const userMessage: StructuredMessage = {
       // Role-based format for API
@@ -321,13 +321,6 @@ const RagAgent: React.FC = () => {
     setInput("");
     setLoading(true);
 
-    // No need to convert history since we're already storing in the correct format
-    // Just map to ensure we only send the fields the API expects
-    const convertedHistory = messages.map((msg) => ({
-      role: msg.role,
-      content: msg.content,
-    }));
-
     // Prepare payload with role-based format
     const payload: RagAgentPayload = {
       query: {
@@ -339,7 +332,6 @@ const RagAgent: React.FC = () => {
             ]
           : queryText,
       },
-      history: convertedHistory,
     };
 
     // Handle chat based on streaming preference

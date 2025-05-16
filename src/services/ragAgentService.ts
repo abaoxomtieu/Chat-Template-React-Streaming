@@ -13,17 +13,6 @@ export interface RagAgentPayload {
           url?: string;
         }>;
   };
-  history: Array<{
-    role: string;
-    content:
-      | string
-      | Array<{
-          type: string;
-          text?: string;
-          source_type?: string;
-          url?: string;
-        }>;
-  }>;
 }
 
 // Response structure for RAG Agent
