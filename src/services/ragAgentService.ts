@@ -14,6 +14,8 @@ export interface RagAgentPayload {
           url?: string;
         }>;
   };
+  bot_id?: string; // Optional bot ID to specify which chatbot to use
+  prompt?: string; // Optional prompt to override the bot's default prompt
 }
 
 // Response structure for RAG Agent

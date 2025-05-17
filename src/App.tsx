@@ -4,6 +4,8 @@ import ImageExplainer from "./pages/ImageExplainer";
 import PromptEngineer from "./pages/PromptEngineer";
 import RagAgent from "./pages/RagAgent";
 import AdaptiveChat from "./pages/AdaptiveChat";
+import ChatbotList from "./pages/ChatbotList";
+import ChatbotEditor from "./pages/ChatbotEditor";
 
 /**
  * The main App component. This component renders a `Router` with routes
@@ -51,11 +53,13 @@ function App() {
 
       {/* <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8"> */}
       <Routes>
-        <Route path="/" element={<Chat />} />
+        <Route path="/" element={<ChatbotList />} />
+        <Route path="/chat" element={<Chat />} />
         <Route path="/image-explainer" element={<ImageExplainer />} />
         <Route path="/prompt-engineer" element={<PromptEngineer />} />
         <Route path="/rag-agent" element={<RagAgent />} />
         <Route path="/adaptive-chat" element={<AdaptiveChat />} />
+        <Route path="/chatbot-editor/:botId" element={<ChatbotEditor />} />
       </Routes>
       {/* </main> */}
       {/* </div> */}

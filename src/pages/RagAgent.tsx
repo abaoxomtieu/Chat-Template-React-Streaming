@@ -1,4 +1,5 @@
 import React, { useState, useRef, useEffect } from "react";
+import { useSearchParams, useNavigate } from "react-router-dom";
 import {
   Avatar,
   Input,
@@ -11,6 +12,7 @@ import {
   Modal,
   List,
   message,
+  Skeleton,
 } from "antd";
 import {
   SendOutlined,
@@ -20,16 +22,22 @@ import {
   InfoCircleOutlined,
   PictureOutlined,
   CloseCircleOutlined,
+  EditOutlined,
+  LeftOutlined,
 } from "@ant-design/icons";
 import FileUploadButton from "../components/FileUploadButton";
 // import ChatMessage from "../components/ChatMessage";
 import ChatMessageAgent from "../components/ChatMessageAgent";
-import { ChatMessage as ChatMessageType } from "../services/chatService";
+import RecommendationContainer, {
+  travelGuideRecommendations,
+} from "../components/RecommendationContainer";
 import {
   RagAgentPayload,
   sendRagAgentMessage,
   sendStreamingRagAgentMessage,
 } from "../services/ragAgentService";
+import { fetchChatbotDetail, Chatbot } from "../services/chatbotService";
+import ChatbotEditModal from "../components/ChatbotEditModal";
 import ReactMarkdown from "react-markdown";
 
 const { TextArea } = Input;
@@ -40,7 +48,14 @@ const RagAgent: React.FC = () => {
   // Define a new type for structured messages that includes role-based format
   interface StructuredMessage {
     role: string;
-    content: string | Array<{type: string; text?: string; source_type?: string; url?: string}>;
+    content:
+      | string
+      | Array<{
+          type: string;
+          text?: string;
+          source_type?: string;
+          url?: string;
+        }>;
     // Keep the original type for backward compatibility with UI components
     type?: string;
     // For display purposes only
@@ -48,16 +63,7 @@ const RagAgent: React.FC = () => {
   }
 
   const [messages, setMessages] = useState<StructuredMessage[]>(() => {
-    // Load chat history from localStorage on initial render
-    const savedMessages = localStorage.getItem(CHAT_HISTORY_KEY);
-    if (savedMessages) {
-      try {
-        return JSON.parse(savedMessages);
-      } catch (error) {
-        console.error("Failed to parse saved messages:", error);
-        return [];
-      }
-    }
+    // We'll initialize this with an empty array and load the proper history after we get the botId
     return [];
   });
   const [input, setInput] = useState("");
@@ -68,13 +74,49 @@ const RagAgent: React.FC = () => {
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
   const [isImageModalVisible, setIsImageModalVisible] = useState(false);
   const [availableImages, setAvailableImages] = useState<any[]>([]);
+  const [searchParams] = useSearchParams();
+  const navigate = useNavigate();
   const [botId, setBotId] = useState<string>("1"); // Default bot ID
+  const [chatbotDetails, setChatbotDetails] = useState<Chatbot | null>(null);
+  const [loadingChatbot, setLoadingChatbot] = useState(false);
+  const [isEditModalVisible, setIsEditModalVisible] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
+
+  // Get botId from URL query parameters and fetch chatbot details
+  useEffect(() => {
+    const botIdFromUrl = searchParams.get("botId");
+    if (botIdFromUrl) {
+      setBotId(botIdFromUrl);
+      // Clear chat history when switching bots
+      setMessages([]);
+
+      // Fetch chatbot details
+      const fetchDetails = async () => {
+        try {
+          setLoadingChatbot(true);
+          const chatbot = await fetchChatbotDetail(botIdFromUrl);
+          setChatbotDetails(chatbot);
+        } catch (error) {
+          console.error(
+            `Error fetching chatbot details for ID ${botIdFromUrl}:`,
+            error
+          );
+          message.error("Failed to load chatbot details");
+        } finally {
+          setLoadingChatbot(false);
+        }
+      };
+
+      fetchDetails();
+    }
+  }, [searchParams]);
 
   // Save messages to localStorage whenever they change
   useEffect(() => {
-    localStorage.setItem(CHAT_HISTORY_KEY, JSON.stringify(messages));
-  }, [messages]);
+    // Use botId in the storage key to separate chat histories for different bots
+    const storageKey = `${CHAT_HISTORY_KEY}_${botId}`;
+    localStorage.setItem(storageKey, JSON.stringify(messages));
+  }, [messages, botId]);
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -83,6 +125,23 @@ const RagAgent: React.FC = () => {
   useEffect(() => {
     scrollToBottom();
   }, [messages, streamingMessage]);
+
+  // Load chat history when botId changes
+  useEffect(() => {
+    // Load chat history from localStorage based on botId
+    const storageKey = `${CHAT_HISTORY_KEY}_${botId}`;
+    const savedMessages = localStorage.getItem(storageKey);
+    if (savedMessages) {
+      try {
+        setMessages(JSON.parse(savedMessages));
+      } catch (error) {
+        console.error("Failed to parse saved messages:", error);
+        setMessages([]);
+      }
+    } else {
+      setMessages([]);
+    }
+  }, [botId]);
 
   // Update available images whenever selected documents change
   useEffect(() => {
@@ -301,7 +360,7 @@ const RagAgent: React.FC = () => {
 
     // Format the query text
     const queryText = input || (selectedImage ? "Hình này là gì?" : "");
-    clearSelectedImage()
+    clearSelectedImage();
     // Create a structured message that includes both role-based format and display format
     const userMessage: StructuredMessage = {
       // Role-based format for API
@@ -335,6 +394,9 @@ const RagAgent: React.FC = () => {
             ]
           : queryText,
       },
+      bot_id: botId,
+      // Include the prompt if we have chatbot details
+      prompt: chatbotDetails?.prompt,
     };
 
     // Handle chat based on streaming preference
@@ -358,15 +420,41 @@ const RagAgent: React.FC = () => {
   const clearHistory = () => {
     setMessages([]);
     setSelectedDocuments([]);
-    localStorage.removeItem(CHAT_HISTORY_KEY);
+  };
+
+  const openEditModal = () => {
+    setIsEditModalVisible(true);
+  };
+
+  const closeEditModal = () => {
+    setIsEditModalVisible(false);
+  };
+
+  const handleChatbotUpdate = (updatedChatbot: Chatbot) => {
+    setChatbotDetails(updatedChatbot);
   };
 
   return (
     <div className="flex flex-col h-screen bg-gradient-to-br from-purple-50 to-indigo-50">
+      {/* Edit Chatbot Modal */}
+      <ChatbotEditModal
+        isVisible={isEditModalVisible}
+        onClose={closeEditModal}
+        chatbot={chatbotDetails}
+        onSuccess={handleChatbotUpdate}
+      />
       {/* Header */}
       <div className="flex-none bg-white/80 backdrop-blur-sm shadow-sm border-b border-purple-100 py-4">
         <div className="max-w-3xl mx-auto flex justify-between items-center px-4">
           <div className="flex items-center gap-3">
+            <Button
+              type="text"
+              icon={<LeftOutlined />}
+              onClick={() => navigate("/")}
+              className="mr-1"
+            >
+              Back
+            </Button>
             <Avatar
               icon={<RobotOutlined />}
               className="bg-gradient-to-r from-purple-600 to-indigo-600 text-white"
@@ -374,20 +462,30 @@ const RagAgent: React.FC = () => {
             />
             <div>
               <h1 className="text-xl font-bold text-gray-800">
-                Travel Guide RAG Agent
+                {chatbotDetails?.name || "AI Assistant"}
               </h1>
               <p className="text-sm text-gray-500">
                 Ask me anything about travel destinations
               </p>
             </div>
           </div>
-          <button
-            onClick={clearHistory}
-            className="flex items-center gap-1 px-3 py-1.5 rounded-lg bg-white border border-red-200 text-red-500 hover:bg-red-50 transition-colors duration-150"
-          >
-            <DeleteOutlined />
-            <span className="text-sm">Clear</span>
-          </button>
+          <div className="flex items-center gap-2">
+            <Button
+              type="primary"
+              icon={<EditOutlined />}
+              onClick={openEditModal}
+            >
+              Edit
+            </Button>
+            <Button
+              type="primary"
+              danger
+              icon={<DeleteOutlined />}
+              onClick={clearHistory}
+            >
+              Clear
+            </Button>
+          </div>
         </div>
       </div>
 
@@ -437,46 +535,27 @@ const RagAgent: React.FC = () => {
           {messages.length === 0 ? (
             <div className="text-center py-10">
               <div className="bg-white rounded-xl p-6 shadow-sm border border-purple-100">
-                <RobotOutlined className="text-4xl text-purple-500 mb-2" />
-                <h3 className="text-lg font-medium text-gray-800 mb-1">
-                  Travel Guide RAG Agent
-                </h3>
-                <p className="text-gray-600 mb-4">
-                  Ask me anything about travel destinations, plan your trips, or
-                  inquire about images of places.
-                </p>
-                <div className="grid grid-cols-1 gap-2 text-left">
-                  <div
-                    className="bg-purple-50 p-3 rounded-lg cursor-pointer hover:bg-purple-100 transition-colors duration-150"
-                    onClick={() => {
-                      setInput("What are popular destinations in Vietnam?");
-                    }}
-                  >
-                    <p className="text-purple-800 font-medium">
-                      What are popular destinations in Vietnam?
+                {loadingChatbot ? (
+                  <Skeleton active avatar paragraph={{ rows: 3 }} />
+                ) : (
+                  <>
+                    <RobotOutlined className="text-4xl text-purple-500 mb-2" />
+                    <h3 className="text-lg font-medium text-gray-800 mb-1">
+                      {chatbotDetails?.name || "AI Assistant"}
+                    </h3>
+                    <p className="text-gray-600 mb-4">
+                      {chatbotDetails?.prompt?.substring(0, 150) + "..." ||
+                        "Ask me anything about travel destinations, plan your trips, or inquire about images of places."}
                     </p>
-                  </div>
-                  <div
-                    className="bg-purple-50 p-3 rounded-lg cursor-pointer hover:bg-purple-100 transition-colors duration-150"
-                    onClick={() => {
-                      setInput("How to plan a 3-day trip to Quy Nhon?");
-                    }}
-                  >
-                    <p className="text-purple-800 font-medium">
-                      How to plan a 3-day trip to Quy Nhon?
-                    </p>
-                  </div>
-                  <div
-                    className="bg-purple-50 p-3 rounded-lg cursor-pointer hover:bg-purple-100 transition-colors duration-150"
-                    onClick={() => {
-                      setInput("What's the best time to visit Ky Co beach?");
-                    }}
-                  >
-                    <p className="text-purple-800 font-medium">
-                      What's the best time to visit Ky Co beach?
-                    </p>
-                  </div>
-                </div>
+                  </>
+                )}
+                <RecommendationContainer
+                  title="Example Questions"
+                  recommendations={travelGuideRecommendations}
+                  onRecommendationClick={(recommendation) =>
+                    setInput(recommendation)
+                  }
+                />
               </div>
             </div>
           ) : (
@@ -485,7 +564,9 @@ const RagAgent: React.FC = () => {
               // If displayContent is available, use it for rendering, otherwise use content
               const displayMessage = {
                 role: msg.role,
-                content: msg.displayContent || (typeof msg.content === 'string' ? msg.content : ''),
+                content:
+                  msg.displayContent ||
+                  (typeof msg.content === "string" ? msg.content : ""),
               };
 
               return <ChatMessageAgent key={index} message={displayMessage} />;
@@ -597,12 +678,14 @@ const RagAgent: React.FC = () => {
                 <ThunderboltOutlined />
                 Streaming {isStreaming ? "On" : "Off"}
               </span>
-              
-              <FileUploadButton 
+
+              <FileUploadButton
                 botId={botId}
                 onUploadSuccess={(result) => {
                   // Refresh the chat or show a notification
-                  message.success(`Successfully processed ${result.file_path} with ${result.chunks_count} chunks`);
+                  message.success(
+                    `Successfully processed ${result.file_path} with ${result.chunks_count} chunks`
+                  );
                 }}
               />
             </div>
