@@ -81,6 +81,7 @@ const RagAgent: React.FC = () => {
   const [loadingChatbot, setLoadingChatbot] = useState(false);
   const [isEditModalVisible, setIsEditModalVisible] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const inputRef = useRef<any>(null);
 
   // Get botId from URL query parameters and fetch chatbot details
   useEffect(() => {
@@ -234,6 +235,11 @@ const RagAgent: React.FC = () => {
             setMessages((prev) => [...prev, aiMessage] as StructuredMessage[]);
             setSelectedDocuments(finalData.selected_documents || []);
             setLoading(false);
+
+            // Refocus on the input field after streaming is done
+            setTimeout(() => {
+              inputRef.current?.focus();
+            }, 100);
           }
         },
         (error: string) => {
@@ -315,6 +321,11 @@ const RagAgent: React.FC = () => {
       setMessages((prev) => [...prev, aiMessage] as StructuredMessage[]);
       setSelectedDocuments(response.selected_documents || []);
       setLoading(false);
+
+      // Refocus on the input field after response is received
+      setTimeout(() => {
+        inputRef.current?.focus();
+      }, 100);
     } catch (error) {
       console.error("Error in non-streaming chat:", error);
       setLoading(false);
@@ -395,8 +406,6 @@ const RagAgent: React.FC = () => {
           : queryText,
       },
       bot_id: botId,
-      // Include the prompt if we have chatbot details
-      prompt: chatbotDetails?.prompt,
     };
 
     // Handle chat based on streaming preference
@@ -730,6 +739,7 @@ const RagAgent: React.FC = () => {
           <div className="flex items-end gap-2">
             <div className="flex-1">
               <TextArea
+                ref={inputRef}
                 placeholder={
                   selectedImage
                     ? "Ask about this image..."

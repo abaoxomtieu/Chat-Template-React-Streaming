@@ -38,11 +38,11 @@ const ChatbotEditModal: React.FC<ChatbotEditModalProps> = ({
   const [form] = Form.useForm();
   const [saving, setSaving] = useState(false);
   const [selectedTools, setSelectedTools] = useState<string[]>([]);
-
+  // Tools are stored as an array of strings
   useEffect(() => {
     if (chatbot && isVisible) {
-      // Extract tool names from the tools array
-      const toolNames = chatbot.tools?.map((tool: any) => tool.name) || [];
+      // Handle tools as an array of strings
+      const toolNames = Array.isArray(chatbot.tools) ? chatbot.tools : [];
       setSelectedTools(toolNames);
       
       form.setFieldsValue({
@@ -57,11 +57,8 @@ const ChatbotEditModal: React.FC<ChatbotEditModalProps> = ({
       const values = await form.validateFields();
       setSaving(true);
       
-      // Format the tools array based on selected tools
-      const tools = selectedTools.map(toolName => ({
-        name: toolName,
-        type: "function"
-      }));
+      // Use the selected tools array directly
+      const tools = selectedTools;
       
       const updateData: ChatbotUpdateRequest = {
         name: values.name,

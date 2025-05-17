@@ -87,6 +87,7 @@ const ChatbotList: React.FC = () => {
               <Card
                 hoverable
                 className="h-full border border-purple-100 shadow-sm hover:shadow-md transition-shadow duration-200"
+                style={{ width: '100%', height: 280 }}
                 actions={[
                   <Button
                     icon={<EditOutlined />}
@@ -119,7 +120,7 @@ const ChatbotList: React.FC = () => {
                       </span>
                     }
                     description={
-                      <div>
+                      <div className="h-32 overflow-hidden">
                         <Paragraph
                           ellipsis={{ rows: 3 }}
                           className="text-gray-600 mb-3"

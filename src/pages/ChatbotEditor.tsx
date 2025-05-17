@@ -47,8 +47,8 @@ const ChatbotEditor: React.FC = () => {
         setLoading(true);
         const data = await fetchChatbotDetail(botId);
         setChatbot(data);
-        // Extract tool names from the tools array
-        const toolNames = data.tools?.map((tool: any) => tool.name) || [];
+        // Handle tools as an array of strings
+        const toolNames = Array.isArray(data.tools) ? data.tools : [];
         setSelectedTools(toolNames);
         
         form.setFieldsValue({
@@ -71,11 +71,8 @@ const ChatbotEditor: React.FC = () => {
 
     try {
       setSaving(true);
-      // Format the tools array based on selected tools
-      const tools = selectedTools.map(toolName => ({
-        name: toolName,
-        type: "function"
-      }));
+      // Use the selected tools array directly
+      const tools = selectedTools;
       
       const updateData: ChatbotUpdateRequest = {
         name: values.name,
