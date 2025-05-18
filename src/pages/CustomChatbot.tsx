@@ -4,8 +4,6 @@ import {
   Avatar,
   Input,
   Button,
-  message,
-  Skeleton,
 } from "antd";
 import {
   SendOutlined,

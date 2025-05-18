@@ -3,7 +3,6 @@ import { Avatar, Input, Switch, Tag } from "antd";
 import {
   SendOutlined,
   DeleteOutlined,
-  ThunderboltOutlined,
   RobotOutlined,
   QuestionCircleOutlined,
 } from "@ant-design/icons";

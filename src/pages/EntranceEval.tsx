@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 
 function EntranceEval() {
   const [loading, setLoading] = useState(false);
@@ -102,6 +102,7 @@ function EntranceEval() {
         ],
       },
     ],
+    language: "vi",
   });
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -113,7 +114,7 @@ function EntranceEval() {
       setPayload((prev) => ({
         ...prev,
         [parent]: {
-          ...prev[parent],
+          ...((prev as any)[parent]),
           [child]: value,
         },
       }));
@@ -149,7 +150,7 @@ function EntranceEval() {
 
       const data = await response.json();
       setResponse(data);
-    } catch (err) {
+    } catch (err: any) {
       setError(err.message || "Something went wrong with the API call");
     } finally {
       setLoading(false);
@@ -213,7 +214,7 @@ function EntranceEval() {
         <input
           type="text"
           name="language"
-          value={payload.language}
+          value={payload.language || "vi"}
           onChange={handleInputChange}
           className="w-full border rounded p-2"
         />
@@ -225,7 +226,9 @@ function EntranceEval() {
           <button
             onClick={() => {
               const el = document.getElementById("payload-json");
-              navigator.clipboard.writeText(el.innerText);
+              if (el) {
+                navigator.clipboard.writeText(el.innerText);
+              }
               alert("Payload copied to clipboard!");
             }}
             className="px-3 py-1 bg-gray-200 rounded text-sm"
