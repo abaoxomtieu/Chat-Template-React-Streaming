@@ -14,6 +14,7 @@ import {
   ArrowRightOutlined,
   ToolOutlined,
   EditOutlined,
+  PlusOutlined,
 } from "@ant-design/icons";
 import { useNavigate } from "react-router-dom";
 import { fetchChatbots, Chatbot } from "../services/chatbotService";
@@ -58,12 +59,26 @@ const ChatbotList: React.FC = () => {
     <div className="min-h-screen bg-gradient-to-br from-indigo-50 via-white to-purple-50 p-4 sm:p-6 md:p-8">
       <div className="max-w-6xl mx-auto">
         <div className="text-center mb-8">
-          <Title
-            level={2}
-            className="bg-gradient-to-r from-purple-600 to-indigo-600 bg-clip-text text-transparent"
-          >
-            Available Chatbots
-          </Title>
+          <div className="flex justify-between items-center mb-4">
+            <div className="flex-1"></div>
+            <Title
+              level={2}
+              className="bg-gradient-to-r from-purple-600 to-indigo-600 bg-clip-text text-transparent"
+            >
+              Available Chatbots
+            </Title>
+            <div className="flex-1 flex justify-end">
+              <Button
+                type="primary"
+                icon={<PlusOutlined />}
+                onClick={() => navigate("/create-prompt")}
+                className="bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700"
+                size="large"
+              >
+                Create New Chatbot
+              </Button>
+            </div>
+          </div>
           <Paragraph className="text-gray-600 max-w-2xl mx-auto">
             Choose from our collection of specialized AI assistants designed to
             help with different tasks

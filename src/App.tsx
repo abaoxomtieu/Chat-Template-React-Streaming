@@ -6,6 +6,7 @@ import RagAgent from "./pages/RagAgent";
 import AdaptiveChat from "./pages/AdaptiveChat";
 import ChatbotList from "./pages/ChatbotList";
 import ChatbotEditor from "./pages/ChatbotEditor";
+import CustomChatbot from "./pages/CustomChatbot";
 
 /**
  * The main App component. This component renders a `Router` with routes
@@ -60,6 +61,7 @@ function App() {
         <Route path="/rag-agent" element={<RagAgent />} />
         <Route path="/adaptive-chat" element={<AdaptiveChat />} />
         <Route path="/chatbot-editor/:botId" element={<ChatbotEditor />} />
+        <Route path="/create-prompt" element={<CustomChatbot />} />
       </Routes>
       {/* </main> */}
       {/* </div> */}
