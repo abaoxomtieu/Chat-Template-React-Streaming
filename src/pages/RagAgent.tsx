@@ -477,6 +477,7 @@ const RagAgent: React.FC = () => {
           : queryText,
       },
       bot_id: botId,
+      conversation_id: conversationId,
     };
 
     // Handle chat based on streaming preference
