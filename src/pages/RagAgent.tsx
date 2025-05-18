@@ -39,10 +39,18 @@ import {
 import { fetchChatbotDetail, Chatbot } from "../services/chatbotService";
 import ChatbotEditModal from "../components/ChatbotEditModal";
 import ReactMarkdown from "react-markdown";
+import { v4 as uuidv4 } from "uuid";
 
 const { TextArea } = Input;
 const { Panel } = Collapse;
 const CHAT_HISTORY_KEY = "rag_agent_chat_history";
+const CONVERSATION_LIST_KEY = "rag_agent_conversation_list";
+
+interface ConversationMeta {
+  conversation_id: string;
+  name: string;
+  created_at: number;
+}
 
 const RagAgent: React.FC = () => {
   // Define a new type for structured messages that includes role-based format
@@ -82,6 +90,8 @@ const RagAgent: React.FC = () => {
   const [isEditModalVisible, setIsEditModalVisible] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<any>(null);
+  const [conversationId, setConversationId] = useState<string>("");
+  const [conversations, setConversations] = useState<ConversationMeta[]>([]);
 
   // Get botId from URL query parameters and fetch chatbot details
   useEffect(() => {
@@ -112,12 +122,47 @@ const RagAgent: React.FC = () => {
     }
   }, [searchParams]);
 
+  // Load conversation list for current botId
+  useEffect(() => {
+    if (!botId) return;
+    const listKey = `${CONVERSATION_LIST_KEY}_${botId}`;
+    const savedList = localStorage.getItem(listKey);
+    if (savedList) {
+      setConversations(JSON.parse(savedList));
+    } else {
+      setConversations([]);
+    }
+  }, [botId]);
+
+  // Load messages for selected conversation
+  useEffect(() => {
+    if (!botId || !conversationId) return;
+    const storageKey = `${CHAT_HISTORY_KEY}_${botId}_${conversationId}`;
+    const savedMessages = localStorage.getItem(storageKey);
+    if (savedMessages) {
+      try {
+        setMessages(JSON.parse(savedMessages));
+      } catch (error) {
+        setMessages([]);
+      }
+    } else {
+      setMessages([]);
+    }
+  }, [botId, conversationId]);
+
   // Save messages to localStorage whenever they change
   useEffect(() => {
-    // Use botId in the storage key to separate chat histories for different bots
-    const storageKey = `${CHAT_HISTORY_KEY}_${botId}`;
+    if (!botId || !conversationId) return;
+    const storageKey = `${CHAT_HISTORY_KEY}_${botId}_${conversationId}`;
     localStorage.setItem(storageKey, JSON.stringify(messages));
-  }, [messages, botId]);
+  }, [messages, botId, conversationId]);
+
+  // Save conversation list whenever it changes
+  useEffect(() => {
+    if (!botId) return;
+    const listKey = `${CONVERSATION_LIST_KEY}_${botId}`;
+    localStorage.setItem(listKey, JSON.stringify(conversations));
+  }, [conversations, botId]);
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -127,22 +172,48 @@ const RagAgent: React.FC = () => {
     scrollToBottom();
   }, [messages, streamingMessage]);
 
-  // Load chat history when botId changes
-  useEffect(() => {
-    // Load chat history from localStorage based on botId
-    const storageKey = `${CHAT_HISTORY_KEY}_${botId}`;
-    const savedMessages = localStorage.getItem(storageKey);
-    if (savedMessages) {
-      try {
-        setMessages(JSON.parse(savedMessages));
-      } catch (error) {
-        console.error("Failed to parse saved messages:", error);
+  // Create a new conversation
+  const createConversation = () => {
+    const newId = uuidv4();
+    const newMeta: ConversationMeta = {
+      conversation_id: newId,
+      name: `Conversation ${conversations.length + 1}`,
+      created_at: Date.now(),
+    };
+    setConversations((prev) => [newMeta, ...prev]);
+    setConversationId(newId);
+    setMessages([]);
+  };
+
+  // Delete a conversation
+  const deleteConversation = (id: string) => {
+    setConversations((prev) => prev.filter((c) => c.conversation_id !== id));
+    localStorage.removeItem(`${CHAT_HISTORY_KEY}_${botId}_${id}`);
+    if (conversationId === id) {
+      // If current, switch to another or clear
+      if (conversations.length > 1) {
+        const next = conversations.find((c) => c.conversation_id !== id);
+        if (next) setConversationId(next.conversation_id);
+      } else {
+        setConversationId("");
         setMessages([]);
       }
-    } else {
-      setMessages([]);
     }
-  }, [botId]);
+  };
+
+  // Select a conversation
+  const selectConversation = (id: string) => {
+    setConversationId(id);
+  };
+
+  // On botId change, auto-select first conversation or create one
+  useEffect(() => {
+    if (conversations.length > 0) {
+      setConversationId(conversations[0].conversation_id);
+    } else {
+      setConversationId("");
+    }
+  }, [conversations]);
 
   // Update available images whenever selected documents change
   useEffect(() => {
@@ -445,6 +516,21 @@ const RagAgent: React.FC = () => {
 
   return (
     <div className="flex flex-col h-screen bg-gradient-to-br from-purple-50 to-indigo-50">
+      {/* Conversation List Sidebar/Header */}
+      <div className="flex-none bg-white/80 backdrop-blur-sm shadow-sm border-b border-purple-100 py-2">
+        <div className="max-w-3xl mx-auto flex items-center gap-2 px-4">
+          <Button type="primary" onClick={createConversation} size="small">+ New Conversation</Button>
+          {conversations.map((conv) => (
+            <div key={conv.conversation_id} className={`flex items-center gap-1 px-2 py-1 rounded cursor-pointer ${conversationId === conv.conversation_id ? 'bg-purple-100' : ''}`}
+              onClick={() => selectConversation(conv.conversation_id)}>
+              <span className="text-sm font-medium">{conv.name}</span>
+              <Button type="text" size="small" danger onClick={e => { e.stopPropagation(); deleteConversation(conv.conversation_id); }}>
+                <DeleteOutlined />
+              </Button>
+            </div>
+          ))}
+        </div>
+      </div>
       {/* Edit Chatbot Modal */}
       <ChatbotEditModal
         isVisible={isEditModalVisible}
