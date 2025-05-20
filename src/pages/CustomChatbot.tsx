@@ -1,10 +1,6 @@
 import React, { useState, useRef, useEffect } from "react";
 import { useSearchParams, useNavigate } from "react-router-dom";
-import {
-  Avatar,
-  Input,
-  Button,
-} from "antd";
+import { Avatar, Input, Button, Select } from "antd";
 import {
   SendOutlined,
   DeleteOutlined,
@@ -25,6 +21,12 @@ interface StructuredMessage {
   displayContent?: string;
 }
 
+const modelOptions = [
+  { label: "Gemini 2.0 Flash", value: "gemini-2.0-flash" },
+  { label: "GPT-4o", value: "gpt-4o" },
+  { label: "GPT-4o Mini", value: "gpt-4o-mini" },
+];
+
 const CustomChatbot: React.FC = () => {
   const [messages, setMessages] = useState<StructuredMessage[]>([]);
   const [input, setInput] = useState("");
@@ -35,8 +37,8 @@ const CustomChatbot: React.FC = () => {
   const [conversationId, setConversationId] = useState<string>("");
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<any>(null);
+  const [modelName, setModelName] = useState<string>(modelOptions[0].value);
 
-  // Generate a unique conversation ID if not present
   useEffect(() => {
     const existingId = searchParams.get("conversationId");
     if (existingId) {
@@ -48,7 +50,6 @@ const CustomChatbot: React.FC = () => {
     }
   }, [searchParams, navigate]);
 
-  // Save messages to localStorage whenever they change
   useEffect(() => {
     const storageKey = `${CHAT_HISTORY_KEY}_${conversationId}`;
     localStorage.setItem(storageKey, JSON.stringify(messages));
@@ -62,7 +63,6 @@ const CustomChatbot: React.FC = () => {
     scrollToBottom();
   }, [messages, streamingMessage]);
 
-  // Load chat history when conversationId changes
   useEffect(() => {
     const storageKey = `${CHAT_HISTORY_KEY}_${conversationId}`;
     const savedMessages = localStorage.getItem(storageKey);
@@ -89,6 +89,7 @@ const CustomChatbot: React.FC = () => {
         body: JSON.stringify({
           query,
           conversation_id: conversationId,
+          model_name: modelName,
         }),
       });
 
@@ -137,9 +138,13 @@ const CustomChatbot: React.FC = () => {
       setStreamingMessage("");
       const errorMessage: StructuredMessage = {
         role: "assistant",
-        content: `Error: ${error instanceof Error ? error.message : "Unknown error"}`,
+        content: `Error: ${
+          error instanceof Error ? error.message : "Unknown error"
+        }`,
         type: "ai",
-        displayContent: `Error: ${error instanceof Error ? error.message : "Unknown error"}`,
+        displayContent: `Error: ${
+          error instanceof Error ? error.message : "Unknown error"
+        }`,
       };
       setMessages((prev) => [...prev, errorMessage]);
     }
@@ -161,7 +166,6 @@ const CustomChatbot: React.FC = () => {
 
     await handleStreamingChat(input);
 
-    // Refocus on the input field after sending
     setTimeout(() => {
       inputRef.current?.focus();
     }, 100);
@@ -180,7 +184,6 @@ const CustomChatbot: React.FC = () => {
 
   return (
     <div className="flex flex-col h-screen bg-gradient-to-br from-purple-50 to-indigo-50">
-      {/* Header */}
       <div className="flex-none bg-white/80 backdrop-blur-sm shadow-sm border-b border-purple-100 py-4">
         <div className="max-w-3xl mx-auto flex justify-between items-center px-4">
           <div className="flex items-center gap-3">
@@ -198,13 +201,22 @@ const CustomChatbot: React.FC = () => {
               size={40}
             />
             <div>
-              <h1 className="text-xl font-bold text-gray-800">Custom AI Assistant</h1>
+              <h1 className="text-xl font-bold text-gray-800">
+                Custom AI Assistant
+              </h1>
               <p className="text-sm text-gray-500">
                 Chat with your custom AI assistant
               </p>
             </div>
           </div>
           <div className="flex items-center gap-2">
+            <Select
+              value={modelName}
+              onChange={setModelName}
+              style={{ width: 180 }}
+              options={modelOptions}
+              className="mr-2"
+            />
             <Button
               type="primary"
               danger
@@ -217,7 +229,6 @@ const CustomChatbot: React.FC = () => {
         </div>
       </div>
 
-      {/* Chat Messages */}
       <div className="flex-1 overflow-y-auto py-4 px-4">
         <div className="max-w-3xl mx-auto space-y-6">
           {messages.length === 0 ? (
@@ -228,7 +239,8 @@ const CustomChatbot: React.FC = () => {
                   Custom AI Assistant
                 </h3>
                 <p className="text-gray-600 mb-4">
-                  Start a conversation with your custom AI assistant. Ask any questions or discuss any topic.
+                  Start a conversation with your custom AI assistant. Ask any
+                  questions or discuss any topic.
                 </p>
               </div>
             </div>
@@ -242,7 +254,6 @@ const CustomChatbot: React.FC = () => {
             })
           )}
 
-          {/* Streaming message */}
           {streamingMessage && (
             <div className="flex justify-center">
               <div className="bg-gray-100 rounded-2xl py-4 w-2/3 animate-pulse">
@@ -254,9 +265,7 @@ const CustomChatbot: React.FC = () => {
                   />
                   <div className="flex-1 text-gray-800 text-sm leading-relaxed">
                     <div className="w-full">
-                      <ReactMarkdown>
-                        {streamingMessage}
-                      </ReactMarkdown>
+                      <ReactMarkdown>{streamingMessage}</ReactMarkdown>
                     </div>
                   </div>
                 </div>
@@ -301,4 +310,4 @@ const CustomChatbot: React.FC = () => {
   );
 };
 
-export default CustomChatbot; 
+export default CustomChatbot;

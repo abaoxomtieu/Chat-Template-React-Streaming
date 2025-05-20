@@ -13,6 +13,7 @@ import {
   List,
   message,
   Skeleton,
+  Select,
 } from "antd";
 import {
   SendOutlined,
@@ -26,7 +27,6 @@ import {
   LeftOutlined,
 } from "@ant-design/icons";
 import FileUploadButton from "../components/FileUploadButton";
-// import ChatMessage from "../components/ChatMessage";
 import ChatMessageAgent from "../components/ChatMessageAgent";
 import RecommendationContainer, {
   travelGuideRecommendations,
@@ -52,8 +52,13 @@ interface ConversationMeta {
   created_at: number;
 }
 
+const modelOptions = [
+  { label: "Gemini 2.0 Flash", value: "gemini-2.0-flash" },
+  { label: "GPT-4o", value: "gpt-4o" },
+  { label: "GPT-4o Mini", value: "gpt-4o-mini" },
+];
+
 const RagAgent: React.FC = () => {
-  // Define a new type for structured messages that includes role-based format
   interface StructuredMessage {
     role: string;
     content:
@@ -64,14 +69,11 @@ const RagAgent: React.FC = () => {
           source_type?: string;
           url?: string;
         }>;
-    // Keep the original type for backward compatibility with UI components
     type?: string;
-    // For display purposes only
     displayContent?: string;
   }
 
   const [messages, setMessages] = useState<StructuredMessage[]>(() => {
-    // We'll initialize this with an empty array and load the proper history after we get the botId
     return [];
   });
   const [input, setInput] = useState("");
@@ -84,7 +86,7 @@ const RagAgent: React.FC = () => {
   const [availableImages, setAvailableImages] = useState<any[]>([]);
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
-  const [botId, setBotId] = useState<string>("1"); // Default bot ID
+  const [botId, setBotId] = useState<string>("1");
   const [chatbotDetails, setChatbotDetails] = useState<Chatbot | null>(null);
   const [loadingChatbot, setLoadingChatbot] = useState(false);
   const [isEditModalVisible, setIsEditModalVisible] = useState(false);
@@ -92,16 +94,14 @@ const RagAgent: React.FC = () => {
   const inputRef = useRef<any>(null);
   const [conversationId, setConversationId] = useState<string>("");
   const [conversations, setConversations] = useState<ConversationMeta[]>([]);
+  const [modelName, setModelName] = useState<string>(modelOptions[0].value);
 
-  // Get botId from URL query parameters and fetch chatbot details
   useEffect(() => {
     const botIdFromUrl = searchParams.get("botId");
     if (botIdFromUrl) {
       setBotId(botIdFromUrl);
-      // Clear chat history when switching bots
       setMessages([]);
 
-      // Fetch chatbot details
       const fetchDetails = async () => {
         try {
           setLoadingChatbot(true);
@@ -122,7 +122,6 @@ const RagAgent: React.FC = () => {
     }
   }, [searchParams]);
 
-  // Load conversation list for current botId
   useEffect(() => {
     if (!botId) return;
     const listKey = `${CONVERSATION_LIST_KEY}_${botId}`;
@@ -134,7 +133,6 @@ const RagAgent: React.FC = () => {
     }
   }, [botId]);
 
-  // Load messages for selected conversation
   useEffect(() => {
     if (!botId || !conversationId) return;
     const storageKey = `${CHAT_HISTORY_KEY}_${botId}_${conversationId}`;
@@ -150,14 +148,12 @@ const RagAgent: React.FC = () => {
     }
   }, [botId, conversationId]);
 
-  // Save messages to localStorage whenever they change
   useEffect(() => {
     if (!botId || !conversationId) return;
     const storageKey = `${CHAT_HISTORY_KEY}_${botId}_${conversationId}`;
     localStorage.setItem(storageKey, JSON.stringify(messages));
   }, [messages, botId, conversationId]);
 
-  // Save conversation list whenever it changes
   useEffect(() => {
     if (!botId) return;
     const listKey = `${CONVERSATION_LIST_KEY}_${botId}`;
@@ -172,7 +168,6 @@ const RagAgent: React.FC = () => {
     scrollToBottom();
   }, [messages, streamingMessage]);
 
-  // Create a new conversation
   const createConversation = () => {
     const newId = uuidv4();
     const newMeta: ConversationMeta = {
@@ -185,12 +180,10 @@ const RagAgent: React.FC = () => {
     setMessages([]);
   };
 
-  // Delete a conversation
   const deleteConversation = (id: string) => {
     setConversations((prev) => prev.filter((c) => c.conversation_id !== id));
     localStorage.removeItem(`${CHAT_HISTORY_KEY}_${botId}_${id}`);
     if (conversationId === id) {
-      // If current, switch to another or clear
       if (conversations.length > 1) {
         const next = conversations.find((c) => c.conversation_id !== id);
         if (next) setConversationId(next.conversation_id);
@@ -201,12 +194,10 @@ const RagAgent: React.FC = () => {
     }
   };
 
-  // Select a conversation
   const selectConversation = (id: string) => {
     setConversationId(id);
   };
 
-  // On botId change, auto-select first conversation or create one
   useEffect(() => {
     if (conversations.length > 0) {
       setConversationId(conversations[0].conversation_id);
@@ -215,9 +206,7 @@ const RagAgent: React.FC = () => {
     }
   }, [conversations]);
 
-  // Update available images whenever selected documents change
   useEffect(() => {
-    // Filter documents to find those with image URLs
     const images = selectedDocuments
       .filter(
         (doc) =>
@@ -240,7 +229,7 @@ const RagAgent: React.FC = () => {
       setSelectedDocuments([]);
 
       await sendStreamingRagAgentMessage(
-        payload,
+        { ...payload, model_name: modelName },
         (message: string) => {
           setStreamingMessage(message);
         },
@@ -251,11 +240,9 @@ const RagAgent: React.FC = () => {
         }) => {
           setStreamingMessage("");
           if (typeof finalData === "object" && "final_response" in finalData) {
-            // Process response to include image URLs from selected documents
             let responseContent = finalData.final_response;
             let contentForApi = responseContent;
 
-            // Check for images in selected documents and include them in the response
             const imageDocuments = (finalData.selected_documents || []).filter(
               (doc) =>
                 doc.metadata &&
@@ -263,29 +250,23 @@ const RagAgent: React.FC = () => {
                 doc.metadata.type === "image"
             );
 
-            // Structure for storing images in the API format
             const contentItems = [];
 
-            // If there's text content, add it first
             if (responseContent) {
               contentItems.push({ type: "text", text: responseContent });
             }
 
-            // Append image URLs to the response if they exist
             if (imageDocuments.length > 0) {
-              // If there's a reference to [Image] without a URL in the response, replace it
               if (
                 responseContent.includes("[Image]") ||
                 responseContent.includes("[image]")
               ) {
                 imageDocuments.forEach((doc) => {
-                  // Replace both [Image] and [image] with proper markdown image syntax for display
                   responseContent = responseContent.replace(
                     /\[Image\]/i,
                     `![image]\n(${doc.metadata.public_url})`
                   );
 
-                  // Add image to content items for API
                   contentItems.push({
                     type: "image",
                     source_type: "url",
@@ -335,7 +316,10 @@ const RagAgent: React.FC = () => {
 
   const handleNonStreamingChat = async (payload: RagAgentPayload) => {
     try {
-      const response = await sendRagAgentMessage(payload);
+      const response = await sendRagAgentMessage({
+        ...payload,
+        model_name: modelName,
+      });
 
       // Process response to include image URLs from selected documents
       let responseContent = response.final_response;
@@ -520,12 +504,27 @@ const RagAgent: React.FC = () => {
       {/* Conversation List Sidebar/Header */}
       <div className="flex-none bg-white/80 backdrop-blur-sm shadow-sm border-b border-purple-100 py-2">
         <div className="max-w-3xl mx-auto flex items-center gap-2 px-4">
-          <Button type="primary" onClick={createConversation} size="small">+ New Conversation</Button>
+          <Button type="primary" onClick={createConversation} size="small">
+            + New Conversation
+          </Button>
           {conversations.map((conv) => (
-            <div key={conv.conversation_id} className={`flex items-center gap-1 px-2 py-1 rounded cursor-pointer ${conversationId === conv.conversation_id ? 'bg-purple-100' : ''}`}
-              onClick={() => selectConversation(conv.conversation_id)}>
+            <div
+              key={conv.conversation_id}
+              className={`flex items-center gap-1 px-2 py-1 rounded cursor-pointer ${
+                conversationId === conv.conversation_id ? "bg-purple-100" : ""
+              }`}
+              onClick={() => selectConversation(conv.conversation_id)}
+            >
               <span className="text-sm font-medium">{conv.name}</span>
-              <Button type="text" size="small" danger onClick={e => { e.stopPropagation(); deleteConversation(conv.conversation_id); }}>
+              <Button
+                type="text"
+                size="small"
+                danger
+                onClick={(e) => {
+                  e.stopPropagation();
+                  deleteConversation(conv.conversation_id);
+                }}
+              >
                 <DeleteOutlined />
               </Button>
             </div>
@@ -581,6 +580,13 @@ const RagAgent: React.FC = () => {
             >
               Clear
             </Button>
+            <Select
+              value={modelName}
+              onChange={setModelName}
+              style={{ width: 180 }}
+              options={modelOptions}
+              className="mr-2"
+            />
           </div>
         </div>
       </div>
