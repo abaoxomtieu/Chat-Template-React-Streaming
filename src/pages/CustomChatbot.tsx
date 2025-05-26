@@ -22,9 +22,8 @@ interface StructuredMessage {
 }
 
 const modelOptions = [
+  { label: "Gemini 2.5 Flash", value: "gemini-2.5-flash-preview-05-20" },
   { label: "Gemini 2.0 Flash", value: "gemini-2.0-flash" },
-  { label: "GPT-4o", value: "gpt-4o" },
-  { label: "GPT-4o Mini", value: "gpt-4o-mini" },
 ];
 
 const CustomChatbot: React.FC = () => {
@@ -37,7 +36,7 @@ const CustomChatbot: React.FC = () => {
   const [conversationId, setConversationId] = useState<string>("");
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<any>(null);
-  const [modelName, setModelName] = useState<string>(modelOptions[0].value);
+  const [modelName, setModelName] = useState<string>("gemini-2.5-flash-preview-05-20");
 
   useEffect(() => {
     const existingId = searchParams.get("conversationId");

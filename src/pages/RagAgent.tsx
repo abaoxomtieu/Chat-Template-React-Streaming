@@ -1,38 +1,14 @@
 import React, { useState, useRef, useEffect } from "react";
 import { useSearchParams, useNavigate } from "react-router-dom";
+import { Avatar, Button, message, Select } from "antd";
 import {
-  Avatar,
-  Input,
-  Switch,
-  Card,
-  Collapse,
-  Button,
-  Image,
-  Modal,
-  List,
-  message,
-  Skeleton,
-  Select,
-} from "antd";
-import {
-  SendOutlined,
   DeleteOutlined,
-  ThunderboltOutlined,
   RobotOutlined,
-  PictureOutlined,
-  CloseCircleOutlined,
   EditOutlined,
   LeftOutlined,
-  MenuFoldOutlined,
-  MenuUnfoldOutlined,
-  MessageOutlined,
-  PlusOutlined,
+  ApiOutlined,
 } from "@ant-design/icons";
-import FileUploadButton from "../components/FileUploadButton";
-import ChatMessageAgent from "../components/ChatMessageAgent";
-import RecommendationContainer, {
-  travelGuideRecommendations,
-} from "../components/RecommendationContainer";
+
 import {
   RagAgentPayload,
   sendRagAgentMessage,
@@ -40,11 +16,13 @@ import {
 } from "../services/ragAgentService";
 import { fetchChatbotDetail, Chatbot } from "../services/chatbotService";
 import ChatbotEditModal from "../components/ChatbotEditModal";
-import ReactMarkdown from "react-markdown";
 import { v4 as uuidv4 } from "uuid";
+import ApiDocs from "../components/ApiDocs";
+import ConversationList from "../components/ConversationList";
+import ChatInput from "../components/ChatInput";
+import ChatMessages from "../components/ChatMessages";
+import ImageSelectionModal from "../components/ImageSelectionModal";
 
-const { TextArea } = Input;
-const { Panel } = Collapse;
 const CHAT_HISTORY_KEY = "rag_agent_chat_history";
 const CONVERSATION_LIST_KEY = "rag_agent_conversation_list";
 
@@ -55,9 +33,8 @@ interface ConversationMeta {
 }
 
 const modelOptions = [
+  { label: "Gemini 2.5 Flash", value: "gemini-2.5-flash-preview-05-20" },
   { label: "Gemini 2.0 Flash", value: "gemini-2.0-flash" },
-  { label: "GPT-4o", value: "gpt-4o" },
-  { label: "GPT-4o Mini", value: "gpt-4o-mini" },
 ];
 
 const RagAgent: React.FC = () => {
@@ -96,8 +73,11 @@ const RagAgent: React.FC = () => {
   const inputRef = useRef<any>(null);
   const [conversationId, setConversationId] = useState<string>("");
   const [conversations, setConversations] = useState<ConversationMeta[]>([]);
-  const [modelName, setModelName] = useState<string>(modelOptions[0].value);
+  const [modelName, setModelName] = useState<string>(
+    "gemini-2.5-flash-preview-05-20"
+  );
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
+  const [isApiDocsVisible, setIsApiDocsVisible] = useState(false);
 
   useEffect(() => {
     const botIdFromUrl = searchParams.get("botId");
@@ -510,77 +490,15 @@ const RagAgent: React.FC = () => {
           isSidebarCollapsed ? "w-16" : "w-64"
         }`}
       >
-        <div className="flex flex-col h-full">
-          {/* Sidebar Header */}
-          <div className="flex items-center justify-between p-4 border-b border-gray-100">
-            {!isSidebarCollapsed && (
-              <span className="text-sm font-medium text-gray-700">
-                Conversations
-              </span>
-            )}
-            <Button
-              type="text"
-              icon={
-                isSidebarCollapsed ? (
-                  <MenuUnfoldOutlined />
-                ) : (
-                  <MenuFoldOutlined />
-                )
-              }
-              onClick={() => setIsSidebarCollapsed(!isSidebarCollapsed)}
-              className="text-gray-600 hover:text-blue-600"
-            />
-          </div>
-
-          {/* Conversation List */}
-          <div className="flex-1 overflow-y-auto p-2">
-            <div className="space-y-2">
-              {!isSidebarCollapsed && (
-                <Button
-                  type="primary"
-                  onClick={createConversation}
-                  size="small"
-                  className="w-full bg-blue-600 hover:bg-blue-700 border-none"
-                  icon={<PlusOutlined />}
-                >
-                  New Conversation
-                </Button>
-              )}
-              {conversations.map((conv) => (
-                <div
-                  key={conv.conversation_id}
-                  className={`flex items-center gap-2 p-2 rounded-lg cursor-pointer transition-all duration-200 ${
-                    conversationId === conv.conversation_id
-                      ? "bg-blue-100 text-blue-700"
-                      : "hover:bg-gray-50 text-gray-600"
-                  }`}
-                  onClick={() => selectConversation(conv.conversation_id)}
-                >
-                  <MessageOutlined className="text-lg" />
-                  {!isSidebarCollapsed && (
-                    <>
-                      <span className="flex-1 text-sm font-medium truncate">
-                        {conv.name}
-                      </span>
-                      <Button
-                        type="text"
-                        size="small"
-                        danger
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          deleteConversation(conv.conversation_id);
-                        }}
-                        className="p-1 hover:bg-red-50"
-                      >
-                        <DeleteOutlined />
-                      </Button>
-                    </>
-                  )}
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
+        <ConversationList
+          conversations={conversations}
+          currentConversationId={conversationId}
+          isSidebarCollapsed={isSidebarCollapsed}
+          onSelectConversation={selectConversation}
+          onDeleteConversation={deleteConversation}
+          onCreateConversation={createConversation}
+          onToggleSidebar={() => setIsSidebarCollapsed(!isSidebarCollapsed)}
+        />
       </div>
 
       {/* Main Content */}
@@ -622,6 +540,14 @@ const RagAgent: React.FC = () => {
               </Button>
               <Button
                 type="primary"
+                icon={<ApiOutlined />}
+                onClick={() => setIsApiDocsVisible(true)}
+                className="bg-green-600 hover:bg-green-700 border-none"
+              >
+                API Docs
+              </Button>
+              <Button
+                type="primary"
                 danger
                 icon={<DeleteOutlined />}
                 onClick={clearHistory}
@@ -641,261 +567,57 @@ const RagAgent: React.FC = () => {
         </div>
 
         {/* Chat Messages */}
-        <div className="flex-1 overflow-y-auto py-4 px-4">
-          <div className="max-w-4xl mx-auto space-y-6">
-            {messages.length === 0 ? (
-              <div className="text-center py-10">
-                <div className="bg-white rounded-xl p-8 shadow-sm border border-gray-100">
-                  {loadingChatbot ? (
-                    <Skeleton active avatar paragraph={{ rows: 3 }} />
-                  ) : (
-                    <>
-                      <RobotOutlined className="text-4xl text-blue-500 mb-4" />
-                      <h3 className="text-lg font-medium text-gray-800 mb-2">
-                        {chatbotDetails?.name || "AI Assistant"}
-                      </h3>
-                      <p className="text-gray-600 mb-6">
-                        {chatbotDetails?.prompt?.substring(0, 150) + "..." ||
-                          "Ask me anything about travel destinations, plan your trips, or inquire about images of places."}
-                      </p>
-                    </>
-                  )}
-                  <RecommendationContainer
-                    title="Example Questions"
-                    recommendations={travelGuideRecommendations}
-                    onRecommendationClick={(recommendation) =>
-                      setInput(recommendation)
-                    }
-                  />
-                </div>
-              </div>
-            ) : (
-              messages.map((msg: StructuredMessage, index: number) => {
-                const displayMessage = {
-                  role: msg.role,
-                  content:
-                    msg.displayContent ||
-                    (typeof msg.content === "string" ? msg.content : ""),
-                };
-                return (
-                  <ChatMessageAgent key={index} message={displayMessage} />
-                );
-              })
-            )}
+        <ChatMessages
+          messages={messages}
+          streamingMessage={streamingMessage}
+          selectedDocuments={selectedDocuments}
+          loadingChatbot={loadingChatbot}
+          chatbotDetails={chatbotDetails}
+          messagesEndRef={messagesEndRef}
+          onRecommendationClick={(recommendation) => setInput(recommendation)}
+        />
 
-            {/* Streaming Message */}
-            {streamingMessage && (
-              <div className="flex justify-center">
-                <div className="bg-gray-50 rounded-2xl py-4 w-2/3 animate-pulse">
-                  <div className="max-w-4xl mx-auto flex gap-4 px-4">
-                    <Avatar
-                      icon={<RobotOutlined />}
-                      className="bg-blue-500 text-white"
-                      size={32}
-                    />
-                    <div className="flex-1 text-gray-800 text-sm leading-relaxed">
-                      <div className="w-full">
-                        <ReactMarkdown
-                          components={{
-                            img: ({ node, src, alt, ...props }) => (
-                              <img
-                                src={src}
-                                alt={alt || "Image"}
-                                className="my-2 max-w-full rounded-md"
-                                {...props}
-                              />
-                            ),
-                          }}
-                        >
-                          {streamingMessage}
-                        </ReactMarkdown>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            )}
-
-            {/* Source Documents */}
-            {selectedDocuments.length > 0 && (
-              <div className="mt-4">
-                <Collapse
-                  className="bg-white/80 border border-gray-100 rounded-xl overflow-hidden"
-                  expandIconPosition="end"
-                >
-                  <Panel
-                    header={
-                      <span className="text-gray-700 font-medium">
-                        Source Documents ({selectedDocuments.length})
-                      </span>
-                    }
-                    key="1"
-                  >
-                    <List
-                      dataSource={selectedDocuments}
-                      renderItem={(doc) => (
-                        <List.Item>
-                          <div className="w-full">
-                            <div className="flex items-start gap-3">
-                              <div className="flex-1">
-                                <div className="text-sm text-gray-600 mb-1">
-                                  {doc.metadata?.content || doc.page_content}
-                                </div>
-                                {doc.metadata?.source && (
-                                  <div className="text-xs text-gray-400">
-                                    Source: {doc.metadata.source}
-                                  </div>
-                                )}
-                              </div>
-                            </div>
-                          </div>
-                        </List.Item>
-                      )}
-                    />
-                  </Panel>
-                </Collapse>
-              </div>
-            )}
-          </div>
-        </div>
-
-        {/* Input Area */}
-        <div className="flex-none p-4 border-t border-gray-100 bg-white/90 backdrop-blur-sm">
-          <div className="max-w-4xl mx-auto">
-            <div className="flex justify-between items-center mb-2">
-              <div className="flex items-center gap-2">
-                <Switch
-                  checked={isStreaming}
-                  onChange={() => setIsStreaming(!isStreaming)}
-                  size="small"
-                  className="bg-gray-200"
-                />
-                <span className="text-xs text-gray-600 flex items-center gap-1">
-                  <ThunderboltOutlined />
-                  Streaming {isStreaming ? "On" : "Off"}
-                </span>
-
-                <FileUploadButton
-                  botId={botId}
-                  onUploadSuccess={(result) => {
-                    message.success(
-                      `Successfully processed ${result.file_path} with ${result.chunks_count} chunks`
-                    );
-                  }}
-                />
-              </div>
-              {availableImages.length > 0 && (
-                <Button
-                  type="default"
-                  size="small"
-                  icon={<PictureOutlined />}
-                  onClick={openImageModal}
-                  className="text-gray-600 hover:text-blue-600"
-                >
-                  Select Image from Sources
-                </Button>
-              )}
-            </div>
-
-            {/* Selected Image Preview */}
-            {selectedImage && (
-              <div className="mb-3 relative">
-                <div className="rounded-lg overflow-hidden border border-gray-200">
-                  <Image
-                    src={selectedImage}
-                    alt="Selected image"
-                    className="max-h-[150px] w-auto mx-auto"
-                    preview={false}
-                  />
-                </div>
-                <Button
-                  type="text"
-                  danger
-                  icon={<CloseCircleOutlined />}
-                  size="small"
-                  className="absolute top-1 right-1 bg-white/80 rounded-full hover:bg-red-50"
-                  onClick={clearSelectedImage}
-                />
-              </div>
-            )}
-
-            <div className="flex items-end gap-2">
-              <div className="flex-1">
-                <TextArea
-                  ref={inputRef}
-                  placeholder={
-                    selectedImage
-                      ? "Ask about this image..."
-                      : "Ask me about travel destinations..."
-                  }
-                  value={input}
-                  onChange={(e) => setInput(e.target.value)}
-                  onKeyDown={handleKeyPress}
-                  autoSize={{ minRows: 1, maxRows: 4 }}
-                  disabled={loading}
-                  className="rounded-xl border-gray-200 focus:border-blue-400 focus:ring focus:ring-blue-200 focus:ring-opacity-50 resize-none"
-                />
-              </div>
-              <button
-                onClick={handleSend}
-                disabled={loading || (!input.trim() && !selectedImage)}
-                className={`p-3 rounded-full transition-all duration-200 ${
-                  loading || (!input.trim() && !selectedImage)
-                    ? "bg-gray-100 text-gray-400 cursor-not-allowed"
-                    : "bg-blue-600 text-white shadow-sm hover:bg-blue-700 hover:shadow-md"
-                }`}
-              >
-                <SendOutlined className="text-lg" />
-              </button>
-            </div>
-          </div>
-        </div>
+        {/* Chat Input */}
+        <ChatInput
+          input={input}
+          loading={loading}
+          isStreaming={isStreaming}
+          selectedImage={selectedImage}
+          availableImages={availableImages}
+          botId={botId}
+          onInputChange={setInput}
+          onSend={handleSend}
+          onKeyPress={handleKeyPress}
+          onStreamingToggle={() => setIsStreaming(!isStreaming)}
+          onImageClear={clearSelectedImage}
+          onImageModalOpen={openImageModal}
+          onUploadSuccess={(result) => {
+            message.success(
+              `Successfully processed ${result.file_path} with ${result.chunks_count} chunks`
+            );
+          }}
+        />
       </div>
 
-      {/* Image Selection Modal */}
-      <Modal
-        title="Select an Image to Chat About"
-        open={isImageModalVisible}
-        onCancel={closeImageModal}
-        footer={null}
-        width={700}
-        className="rounded-xl"
-      >
-        <List
-          grid={{ gutter: 16, column: 2 }}
-          dataSource={availableImages}
-          renderItem={(image) => (
-            <List.Item>
-              <Card
-                hoverable
-                className="border border-gray-100 rounded-xl overflow-hidden"
-                cover={
-                  <div className="h-48 overflow-hidden">
-                    <Image
-                      alt="Travel destination"
-                      src={image.url}
-                      className="w-full h-full object-cover"
-                    />
-                  </div>
-                }
-                onClick={() => selectImage(image.url)}
-              >
-                <Card.Meta
-                  title={`Image ${image.id.substring(0, 8)}...`}
-                  description={image.content.substring(0, 100) + "..."}
-                />
-              </Card>
-            </List.Item>
-          )}
-        />
-      </Modal>
+      {/* Modals */}
+      <ImageSelectionModal
+        isVisible={isImageModalVisible}
+        onClose={closeImageModal}
+        availableImages={availableImages}
+        onImageSelect={selectImage}
+      />
 
-      {/* Edit Chatbot Modal */}
       <ChatbotEditModal
         isVisible={isEditModalVisible}
         onClose={closeEditModal}
         chatbot={chatbotDetails}
         onSuccess={handleChatbotUpdate}
+      />
+
+      <ApiDocs
+        isVisible={isApiDocsVisible}
+        onClose={() => setIsApiDocsVisible(false)}
+        botId={botId}
       />
     </div>
   );

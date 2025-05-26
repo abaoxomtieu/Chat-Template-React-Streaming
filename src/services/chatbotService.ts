@@ -27,6 +27,27 @@ export interface ChatbotListResponse {
   chatbots: Chatbot[];
 }
 
+// Model options interface
+export interface ModelOption {
+  value: string;
+  label: string;
+}
+
+// Available models
+export const AVAILABLE_MODELS: ModelOption[] = [
+  {
+    value: "gemini-2.5-flash-preview-05-20",
+    label: "Gemini 2.5 Flash",
+  },
+  {
+    value: "gemini-2.0-flash",
+    label: "Gemini 2.0 Flash",
+  },
+];
+
+// Default model
+export const DEFAULT_MODEL = "gemini-2.5-flash-preview-05-20";
+
 /**
  * Fetch all available chatbots
  */
