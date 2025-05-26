@@ -15,6 +15,7 @@ import {
   Tooltip,
 } from "antd";
 import { ArrowLeftOutlined, SaveOutlined, RobotOutlined, ToolOutlined, QuestionCircleOutlined } from "@ant-design/icons";
+import { useTranslation } from "react-i18next";
 import {
   fetchChatbotDetail,
   updateChatbot,
@@ -26,6 +27,7 @@ const { Title, Paragraph } = Typography;
 const { TextArea } = Input;
 
 const ChatbotEditor: React.FC = () => {
+  const { t } = useTranslation();
   const { botId } = useParams<{ botId: string }>();
   const navigate = useNavigate();
   const [form] = Form.useForm();
@@ -38,7 +40,7 @@ const ChatbotEditor: React.FC = () => {
   useEffect(() => {
     const fetchChatbot = async () => {
       if (!botId) {
-        setError("No chatbot ID provided");
+        setError(t("chatbotEditor.noIdError"));
         setLoading(false);
         return;
       }
@@ -57,46 +59,45 @@ const ChatbotEditor: React.FC = () => {
         });
       } catch (err) {
         console.error("Error fetching chatbot:", err);
-        setError("Failed to load chatbot details");
+        setError(t("chatbotEditor.loadError"));
       } finally {
         setLoading(false);
       }
     };
 
     fetchChatbot();
-  }, [botId, form]);
+  }, [botId, form, t]);
 
   const handleSubmit = async (values: any) => {
-    if (!botId) return;
-
     try {
       setSaving(true);
-      // Use the selected tools array directly
-      const tools = selectedTools;
-      
       const updateData: ChatbotUpdateRequest = {
         name: values.name,
         prompt: values.prompt,
-        tools: tools
+        tools: selectedTools,
       };
 
-      await updateChatbot(botId, updateData);
-      message.success("Chatbot updated successfully");
+      if (botId) {
+        const updatedChatbot = await updateChatbot(botId, updateData);
+        setChatbot(updatedChatbot);
+        message.success(t("chatbotEditor.updateSuccess"));
+        navigate("/chatbots");
+      }
     } catch (err) {
       console.error("Error updating chatbot:", err);
-      message.error("Failed to update chatbot");
+      message.error(t("chatbotEditor.updateError"));
     } finally {
       setSaving(false);
     }
   };
 
   const handleBack = () => {
-    navigate("/");
+    navigate("/chatbots");
   };
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center min-h-screen">
+      <div className="flex justify-center items-center h-screen">
         <Spin size="large" />
       </div>
     );
@@ -104,18 +105,20 @@ const ChatbotEditor: React.FC = () => {
 
   if (error) {
     return (
-      <div className="p-6">
+      <div className="max-w-4xl mx-auto px-4 py-8">
         <Alert
-          message="Error"
+          message={t("chatbotEditor.error")}
           description={error}
           type="error"
           showIcon
-          action={
-            <Button type="primary" onClick={handleBack}>
-              Back to List
-            </Button>
-          }
         />
+        <Button
+          type="primary"
+          onClick={handleBack}
+          className="mt-4"
+        >
+          {t("common.back")}
+        </Button>
       </div>
     );
   }
@@ -131,13 +134,13 @@ const ChatbotEditor: React.FC = () => {
             onClick={handleBack}
             className="text-gray-600 hover:text-blue-600 mb-4"
           >
-            Back to Chatbot List
+            {t("common.back")}
           </Button>
           <Title level={2} className="bg-gradient-to-r from-purple-600 to-indigo-600 bg-clip-text text-transparent">
-            Edit Chatbot
+            {t("chatbotEditor.title")}
           </Title>
           <Paragraph className="text-gray-600">
-            Customize your chatbot's name, prompt, and other settings.
+            {t("chatbotEditor.description")}
           </Paragraph>
         </div>
 
@@ -148,10 +151,10 @@ const ChatbotEditor: React.FC = () => {
             </div>
             <div>
               <Title level={4} className="m-0">
-                {chatbot?.name || "Chatbot"}
+                {chatbot?.name || t("chatbotEditor.defaultName")}
               </Title>
               <Paragraph className="text-gray-500 m-0">
-                ID: {botId}
+                {t("chatbotEditor.id")}: {botId}
               </Paragraph>
             </div>
           </div>
@@ -169,20 +172,20 @@ const ChatbotEditor: React.FC = () => {
           >
             <Form.Item
               name="name"
-              label="Chatbot Name"
-              rules={[{ required: true, message: "Please enter a name" }]}
+              label={t("chatbotEditor.nameLabel")}
+              rules={[{ required: true, message: t("chatbotEditor.nameRequired") }]}
             >
-              <Input placeholder="Enter chatbot name" />
+              <Input placeholder={t("chatbotEditor.namePlaceholder")} />
             </Form.Item>
 
             <Form.Item
               name="prompt"
-              label="System Prompt"
-              rules={[{ required: true, message: "Please enter a prompt" }]}
-              help="This is the system prompt that defines your chatbot's personality and capabilities."
+              label={t("chatbotEditor.promptLabel")}
+              rules={[{ required: true, message: t("chatbotEditor.promptRequired") }]}
+              help={t("chatbotEditor.promptHelp")}
             >
               <TextArea
-                placeholder="Enter system prompt"
+                placeholder={t("chatbotEditor.promptPlaceholder")}
                 autoSize={{ minRows: 6, maxRows: 12 }}
                 className="font-mono text-sm"
               />
@@ -191,71 +194,62 @@ const ChatbotEditor: React.FC = () => {
             <Divider>
               <Space>
                 <ToolOutlined />
-                <span>Available Tools</span>
+                <span>{t("chatbotEditor.toolsTitle")}</span>
               </Space>
             </Divider>
 
-            <div className="mb-6">
-              <div className="flex items-center mb-2">
-                <span className="font-medium mr-2">Tools</span>
-                <Tooltip title="Select tools that your chatbot can use to enhance its capabilities">
+            <div className="space-y-4">
+              <div className="flex items-center gap-2">
+                <Checkbox
+                  checked={selectedTools.includes("search")}
+                  onChange={(e) => {
+                    if (e.target.checked) {
+                      setSelectedTools([...selectedTools, "search"]);
+                    } else {
+                      setSelectedTools(selectedTools.filter(tool => tool !== "search"));
+                    }
+                  }}
+                >
+                  {t("chatbotEditor.searchTool")}
+                </Checkbox>
+                <Tooltip title={t("chatbotEditor.searchToolHelp")}>
                   <QuestionCircleOutlined className="text-gray-400" />
                 </Tooltip>
               </div>
-              
-              <div className="space-y-3">
-                <div className="flex items-center">
-                  <Checkbox
-                    checked={selectedTools.includes("retrieve_document")}
-                    onChange={(e) => {
-                      if (e.target.checked) {
-                        setSelectedTools([...selectedTools, "retrieve_document"]);
-                      } else {
-                        setSelectedTools(selectedTools.filter(t => t !== "retrieve_document"));
-                      }
-                    }}
-                  >
-                    <span className="font-medium">Document Retrieval</span>
-                  </Checkbox>
-                  <div className="ml-6 text-sm text-gray-500">
-                    Allows the chatbot to search and retrieve information from your document database
-                  </div>
-                </div>
-                
-                <div className="flex items-center">
-                  <Checkbox
-                    checked={selectedTools.includes("search_engine")}
-                    onChange={(e) => {
-                      if (e.target.checked) {
-                        setSelectedTools([...selectedTools, "search_engine"]);
-                      } else {
-                        setSelectedTools(selectedTools.filter(t => t !== "search_engine"));
-                      }
-                    }}
-                  >
-                    <span className="font-medium">Web Search</span>
-                  </Checkbox>
-                  <div className="ml-6 text-sm text-gray-500">
-                    Allows the chatbot to search the web for current information
-                  </div>
-                </div>
+
+              <div className="flex items-center gap-2">
+                <Checkbox
+                  checked={selectedTools.includes("calculator")}
+                  onChange={(e) => {
+                    if (e.target.checked) {
+                      setSelectedTools([...selectedTools, "calculator"]);
+                    } else {
+                      setSelectedTools(selectedTools.filter(tool => tool !== "calculator"));
+                    }
+                  }}
+                >
+                  {t("chatbotEditor.calculatorTool")}
+                </Checkbox>
+                <Tooltip title={t("chatbotEditor.calculatorToolHelp")}>
+                  <QuestionCircleOutlined className="text-gray-400" />
+                </Tooltip>
               </div>
             </div>
 
-            <Form.Item>
-              <Space>
-                <Button
-                  type="primary"
-                  htmlType="submit"
-                  loading={saving}
-                  icon={<SaveOutlined />}
-                  className="bg-gradient-to-r from-purple-600 to-indigo-600"
-                >
-                  Save Changes
-                </Button>
-                <Button onClick={handleBack}>Cancel</Button>
-              </Space>
-            </Form.Item>
+            <div className="mt-8 flex justify-end gap-4">
+              <Button onClick={handleBack}>
+                {t("common.cancel")}
+              </Button>
+              <Button
+                type="primary"
+                htmlType="submit"
+                loading={saving}
+                icon={<SaveOutlined />}
+                className="bg-gradient-to-r from-purple-600 to-indigo-600"
+              >
+                {t("common.save")}
+              </Button>
+            </div>
           </Form>
         </Card>
       </div>

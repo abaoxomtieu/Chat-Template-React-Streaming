@@ -1,0 +1,156 @@
+{
+  "common": {
+    "loading": "Đang tải...",
+    "error": "Có lỗi xảy ra",
+    "success": "Thành công",
+    "save": "Lưu",
+    "cancel": "Hủy",
+    "delete": "Xóa",
+    "edit": "Chỉnh sửa",
+    "create": "Tạo mới",
+    "search": "Tìm kiếm",
+    "noData": "Không có dữ liệu",
+    "confirm": "Xác nhận",
+    "back": "Quay lại",
+    "next": "Tiếp theo",
+    "finish": "Hoàn thành",
+    "language": "Ngôn ngữ"
+  },
+  "chat": {
+    "inputPlaceholder": "Hỏi tôi về điểm du lịch...",
+    "imageInputPlaceholder": "Hỏi về hình ảnh này...",
+    "streaming": "Phát trực tiếp",
+    "streamingOn": "Bật",
+    "streamingOff": "Tắt",
+    "selectImage": "Chọn ảnh từ nguồn",
+    "clearHistory": "Xóa lịch sử",
+    "newConversation": "Cuộc trò chuyện mới",
+    "conversations": "Các cuộc trò chuyện",
+    "sourceDocuments": "Tài liệu nguồn",
+    "exampleQuestions": "Câu hỏi mẫu",
+    "send": "Gửi",
+    "typeMessage": "Nhập tin nhắn...",
+    "thinking": "Đang suy nghĩ...",
+    "clear": "Xóa lịch sử",
+    "clearConfirm": "Bạn có chắc chắn muốn xóa cuộc trò chuyện này?",
+    "uploadImage": "Tải ảnh lên",
+    "uploadFile": "Tải tệp lên",
+    "processing": "Đang xử lý...",
+    "error": "Lỗi",
+    "retry": "Thử lại",
+    "stop": "Dừng",
+    "copy": "Sao chép",
+    "copied": "Đã sao chép",
+    "processingFile": "Đang xử lý tệp...",
+    "fileUploadSuccess": "Đã xử lý thành công {{file_path}} với {{chunks_count}} phần",
+    "fileUploadError": "Lỗi khi tải lên tệp",
+    "noMessages": "Chưa có tin nhắn nào"
+  },
+  "landing": {
+    "title": "Trợ lý AI thông minh",
+    "description": "Tạo và quản lý các trợ lý AI của bạn để giúp với việc lập kế hoạch du lịch, thông tin điểm đến và hơn thế nữa.",
+    "getStarted": "Bắt đầu ngay",
+    "startJourney": "Bắt đầu hành trình",
+    "features": {
+      "title": "Tính năng",
+      "feature1": {
+        "title": "Trí tuệ nhân tạo",
+        "description": "Sử dụng công nghệ AI tiên tiến để cung cấp trải nghiệm trò chuyện thông minh"
+      },
+      "feature2": {
+        "title": "Tùy chỉnh",
+        "description": "Tùy chỉnh trợ lý của bạn với các tính năng và kiến thức chuyên biệt"
+      },
+      "feature3": {
+        "title": "Tích hợp dễ dàng",
+        "description": "Tích hợp trợ lý AI vào ứng dụng của bạn một cách dễ dàng"
+      }
+    },
+    "capabilities": {
+      "title": "Khả năng",
+      "capability1": "Trả lời câu hỏi về điểm đến du lịch",
+      "capability2": "Đề xuất lịch trình du lịch",
+      "capability3": "Cung cấp thông tin về văn hóa địa phương",
+      "capability4": "Hỗ trợ đặt phòng và vé"
+    },
+    "testimonials": {
+      "title": "Đánh giá từ người dùng",
+      "testimonial1": {
+        "text": "Trợ lý AI này đã giúp tôi lên kế hoạch chuyến đi hoàn hảo!",
+        "author": "Nguyễn Văn A"
+      },
+      "testimonial2": {
+        "text": "Thông tin chính xác và hữu ích cho mọi chuyến đi.",
+        "author": "Trần Thị B"
+      }
+    }
+  },
+  "chatbotList": {
+    "title": "Trợ lý AI của bạn",
+    "description": "Tạo và quản lý các trợ lý AI của bạn để giúp với việc lập kế hoạch du lịch, thông tin điểm đến và hơn thế nữa.",
+    "createNew": "Tạo trợ lý mới",
+    "search": "Tìm kiếm trợ lý...",
+    "noChatbots": "Không tìm thấy trợ lý AI nào",
+    "createFirst": "Tạo trợ lý AI đầu tiên của bạn để bắt đầu trò chuyện thông minh về điểm đến du lịch.",
+    "deleteTitle": "Xóa trợ lý",
+    "deleteConfirm": "Bạn có chắc chắn muốn xóa trợ lý này? Hành động này không thể hoàn tác.",
+    "deleteSuccess": "Đã xóa trợ lý thành công",
+    "deleteError": "Không thể xóa trợ lý",
+    "loadError": "Không thể tải danh sách trợ lý",
+    "noDescription": "Không có mô tả",
+    "name": "Tên",
+    "createdAt": "Ngày tạo",
+    "lastModified": "Lần sửa đổi cuối",
+    "status": "Trạng thái",
+    "actions": "Thao tác"
+  },
+  "chatbotEditor": {
+    "title": "Chỉnh sửa trợ lý",
+    "description": "Tùy chỉnh tên, lời nhắc và các cài đặt khác của trợ lý của bạn.",
+    "nameLabel": "Tên trợ lý",
+    "namePlaceholder": "Nhập tên trợ lý",
+    "nameRequired": "Vui lòng nhập tên",
+    "promptLabel": "Lời nhắc hệ thống",
+    "promptPlaceholder": "Nhập lời nhắc hệ thống",
+    "promptRequired": "Vui lòng nhập lời nhắc",
+    "promptHelp": "Đây là lời nhắc hệ thống định nghĩa tính cách và khả năng của trợ lý của bạn.",
+    "toolsTitle": "Công cụ có sẵn",
+    "searchTool": "Tìm kiếm",
+    "searchToolHelp": "Cho phép trợ lý tìm kiếm thông tin trên web",
+    "calculatorTool": "Máy tính",
+    "calculatorToolHelp": "Cho phép trợ lý thực hiện các phép tính",
+    "error": "Lỗi",
+    "loadError": "Không thể tải thông tin trợ lý",
+    "updateSuccess": "Đã cập nhật trợ lý thành công",
+    "updateError": "Không thể cập nhật trợ lý",
+    "noIdError": "Không có ID trợ lý",
+    "defaultName": "Trợ lý AI",
+    "defaultDescription": "Hỏi tôi bất cứ điều gì về điểm đến du lịch",
+    "id": "ID",
+    "apiDocs": "Tài liệu API"
+  },
+  "customChatbot": {
+    "title": "Tạo trợ lý tùy chỉnh",
+    "step1": "Chọn loại trợ lý",
+    "step2": "Cấu hình trợ lý",
+    "step3": "Xem trước và tạo",
+    "name": "Tên Chatbot",
+    "description": "Mô tả",
+    "purpose": "Mục đích",
+    "targetAudience": "Đối tượng mục tiêu",
+    "model": "Mô hình AI",
+    "temperature": "Nhiệt độ",
+    "maxTokens": "Số token tối đa",
+    "uploadDocuments": "Tải lên tài liệu",
+    "addKnowledge": "Thêm kiến thức",
+    "createSuccess": "Đã tạo trợ lý thành công",
+    "createError": "Không thể tạo trợ lý"
+  },
+  "errors": {
+    "required": "Trường này là bắt buộc",
+    "invalidEmail": "Email không hợp lệ",
+    "serverError": "Lỗi máy chủ",
+    "networkError": "Lỗi kết nối",
+    "unknownError": "Lỗi không xác định"
+  }
+} 

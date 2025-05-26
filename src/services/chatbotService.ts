@@ -10,6 +10,7 @@ export interface Chatbot {
   id: string;
   name: string;
   prompt: string;
+  description?: string;
   tools: any[];
   created_at?: string;
   updated_at?: string;

@@ -8,6 +8,7 @@ import {
   LeftOutlined,
   ApiOutlined,
 } from "@ant-design/icons";
+import { useTranslation } from "react-i18next";
 
 import {
   RagAgentPayload,
@@ -38,6 +39,7 @@ const modelOptions = [
 ];
 
 const RagAgent: React.FC = () => {
+  const { t } = useTranslation();
   interface StructuredMessage {
     role: string;
     content:
@@ -95,7 +97,7 @@ const RagAgent: React.FC = () => {
             `Error fetching chatbot details for ID ${botIdFromUrl}:`,
             error
           );
-          message.error("Failed to load chatbot details");
+          message.error(t("chatbotEditor.loadError"));
         } finally {
           setLoadingChatbot(false);
         }
@@ -103,7 +105,7 @@ const RagAgent: React.FC = () => {
 
       fetchDetails();
     }
-  }, [searchParams]);
+  }, [searchParams, t]);
 
   useEffect(() => {
     if (!botId) return;
@@ -155,7 +157,7 @@ const RagAgent: React.FC = () => {
     const newId = uuidv4();
     const newMeta: ConversationMeta = {
       conversation_id: newId,
-      name: `Conversation ${conversations.length + 1}`,
+      name: `${t("chat.newConversation")} ${conversations.length + 1}`,
       created_at: Date.now(),
     };
     setConversations((prev) => [newMeta, ...prev]);
@@ -259,7 +261,6 @@ const RagAgent: React.FC = () => {
               }
             }
 
-            // Create a structured message with both display and API formats
             const aiMessage: StructuredMessage = {
               role: "assistant",
               content: contentItems.length > 1 ? contentItems : contentForApi,
@@ -271,7 +272,6 @@ const RagAgent: React.FC = () => {
             setSelectedDocuments(finalData.selected_documents || []);
             setLoading(false);
 
-            // Refocus on the input field after streaming is done
             setTimeout(() => {
               inputRef.current?.focus();
             }, 100);
@@ -281,12 +281,11 @@ const RagAgent: React.FC = () => {
           console.error("Streaming error:", error);
           setLoading(false);
           setStreamingMessage("");
-          // Add error message
           const errorMessage: StructuredMessage = {
             role: "assistant",
-            content: `Error: ${error}`,
+            content: `${t("chat.error")}: ${error}`,
             type: "ai",
-            displayContent: `Error: ${error}`,
+            displayContent: `${t("chat.error")}: ${error}`,
           };
           setMessages((prev) => [...prev, errorMessage] as StructuredMessage[]);
         }
@@ -304,11 +303,9 @@ const RagAgent: React.FC = () => {
         model_name: modelName,
       });
 
-      // Process response to include image URLs from selected documents
       let responseContent = response.final_response;
       let contentForApi = responseContent;
 
-      // Check for images in selected documents and include them in the response
       const imageDocuments = (response.selected_documents || []).filter(
         (doc) =>
           doc.metadata &&
@@ -316,29 +313,23 @@ const RagAgent: React.FC = () => {
           doc.metadata.type === "image"
       );
 
-      // Structure for storing images in the API format
       const contentItems = [];
 
-      // If there's text content, add it first
       if (responseContent) {
         contentItems.push({ type: "text", text: responseContent });
       }
 
-      // Append image URLs to the response if they exist
       if (imageDocuments.length > 0) {
-        // If there's a reference to [Image] without a URL in the response, replace it
         if (
           responseContent.includes("[Image]") ||
           responseContent.includes("[image]")
         ) {
           imageDocuments.forEach((doc) => {
-            // Replace both [Image] and [image] with proper markdown image syntax for display
             responseContent = responseContent.replace(
               /\[Image\]/i,
               `![image]\n(${doc.metadata.public_url})`
             );
 
-            // Add image to content items for API
             contentItems.push({
               type: "image",
               source_type: "url",
@@ -348,7 +339,6 @@ const RagAgent: React.FC = () => {
         }
       }
 
-      // Create a structured message with both display and API formats
       const aiMessage: StructuredMessage = {
         role: "assistant",
         content: contentItems.length > 1 ? contentItems : contentForApi,
@@ -360,7 +350,6 @@ const RagAgent: React.FC = () => {
       setSelectedDocuments(response.selected_documents || []);
       setLoading(false);
 
-      // Refocus on the input field after response is received
       setTimeout(() => {
         inputRef.current?.focus();
       }, 100);
@@ -368,38 +357,33 @@ const RagAgent: React.FC = () => {
       console.error("Error in non-streaming chat:", error);
       setLoading(false);
 
-      // Add error message
       const errorMessage: StructuredMessage = {
         role: "assistant",
-        content: `Error: ${
-          error instanceof Error ? error.message : "Unknown error"
+        content: `${t("chat.error")}: ${
+          error instanceof Error ? error.message : t("errors.unknownError")
         }`,
         type: "ai",
-        displayContent: `Error: ${
-          error instanceof Error ? error.message : "Unknown error"
+        displayContent: `${t("chat.error")}: ${
+          error instanceof Error ? error.message : t("errors.unknownError")
         }`,
       };
       setMessages((prev) => [...prev, errorMessage] as StructuredMessage[]);
     }
   };
 
-  // Function to open the image selection modal
   const openImageModal = () => {
     setIsImageModalVisible(true);
   };
 
-  // Function to close the image selection modal
   const closeImageModal = () => {
     setIsImageModalVisible(false);
   };
 
-  // Function to select an image for chat
   const selectImage = (imageUrl: string) => {
     setSelectedImage(imageUrl);
     closeImageModal();
   };
 
-  // Function to clear the selected image
   const clearSelectedImage = () => {
     setSelectedImage(null);
   };
@@ -407,12 +391,10 @@ const RagAgent: React.FC = () => {
   const handleSend = async () => {
     if ((!input.trim() && !selectedImage) || loading) return;
 
-    // Format the query text
-    const queryText = input || (selectedImage ? "Hình này là gì?" : "");
+    const queryText =
+      input || (selectedImage ? t("chat.imageInputPlaceholder") : "");
     clearSelectedImage();
-    // Create a structured message that includes both role-based format and display format
     const userMessage: StructuredMessage = {
-      // Role-based format for API
       role: "user",
       content: selectedImage
         ? [
@@ -420,9 +402,7 @@ const RagAgent: React.FC = () => {
             { type: "image", source_type: "url", url: selectedImage },
           ]
         : queryText,
-      // Original type for backward compatibility
       type: "human",
-      // Display content for UI rendering (only used for display)
       displayContent: selectedImage
         ? `${queryText}\n![image](${selectedImage})`
         : queryText,
@@ -432,7 +412,6 @@ const RagAgent: React.FC = () => {
     setInput("");
     setLoading(true);
 
-    // Prepare payload with role-based format
     const payload: RagAgentPayload = {
       query: {
         role: "user",
@@ -447,14 +426,12 @@ const RagAgent: React.FC = () => {
       conversation_id: conversationId,
     };
 
-    // Handle chat based on streaming preference
     if (isStreaming) {
       await handleStreamingChat(payload);
     } else {
       await handleNonStreamingChat(payload);
     }
 
-    // Clear the selected image after sending
     clearSelectedImage();
   };
 
@@ -513,7 +490,7 @@ const RagAgent: React.FC = () => {
                 onClick={() => navigate("/")}
                 className="text-gray-600 hover:text-blue-600"
               >
-                Back
+                {t("common.back")}
               </Button>
               <Avatar
                 icon={<RobotOutlined />}
@@ -522,10 +499,10 @@ const RagAgent: React.FC = () => {
               />
               <div>
                 <h1 className="text-xl font-semibold text-gray-800">
-                  {chatbotDetails?.name || "AI Assistant"}
+                  {chatbotDetails?.name || t("chatbotEditor.defaultName")}
                 </h1>
                 <p className="text-sm text-gray-500">
-                  Ask me anything about travel destinations
+                  {chatbotDetails?.description}
                 </p>
               </div>
             </div>
@@ -536,7 +513,7 @@ const RagAgent: React.FC = () => {
                 onClick={openEditModal}
                 className="bg-blue-600 hover:bg-blue-700 border-none"
               >
-                Edit
+                {t("common.edit")}
               </Button>
               <Button
                 type="primary"
@@ -544,7 +521,7 @@ const RagAgent: React.FC = () => {
                 onClick={() => setIsApiDocsVisible(true)}
                 className="bg-green-600 hover:bg-green-700 border-none"
               >
-                API Docs
+                {t("chatbotEditor.apiDocs")}
               </Button>
               <Button
                 type="primary"
@@ -553,7 +530,7 @@ const RagAgent: React.FC = () => {
                 onClick={clearHistory}
                 className="bg-red-500 hover:bg-red-600 border-none"
               >
-                Clear
+                {t("chat.clearHistory")}
               </Button>
               <Select
                 value={modelName}
@@ -593,7 +570,10 @@ const RagAgent: React.FC = () => {
           onImageModalOpen={openImageModal}
           onUploadSuccess={(result) => {
             message.success(
-              `Successfully processed ${result.file_path} with ${result.chunks_count} chunks`
+              t("chat.fileUploadSuccess", {
+                file_path: result.file_path,
+                chunks_count: result.chunks_count,
+              })
             );
           }}
         />

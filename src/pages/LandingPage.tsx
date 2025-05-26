@@ -1,296 +1,267 @@
 import React from "react";
 import { Button } from "antd";
-import {
-  RobotOutlined,
-  ThunderboltOutlined,
-  GlobalOutlined,
-  MessageOutlined,
-  ArrowRightOutlined,
-  StarOutlined,
-  TeamOutlined,
-  FileTextOutlined,
-  ApiOutlined,
-  DatabaseOutlined,
-} from "@ant-design/icons";
 import { useNavigate } from "react-router-dom";
-
+import { useTranslation } from "react-i18next";
+import LanguageSwitcher from "../components/LanguageSwitcher";
 
 const LandingPage: React.FC = () => {
   const navigate = useNavigate();
-
-  const features = [
-    {
-      icon: <RobotOutlined className="text-3xl text-blue-500" />,
-      title: "Custom AI Chatbot Creation",
-      description: "Create your own AI chatbot with interactive prompt generation and intelligent information collection.",
-    },
-    {
-      icon: <FileTextOutlined className="text-3xl text-blue-500" />,
-      title: "RAG-based Processing",
-      description: "Power your chatbot with document processing, intelligent retrieval, and context-aware responses.",
-    },
-    {
-      icon: <ApiOutlined className="text-3xl text-blue-500" />,
-      title: "Multiple AI Models",
-      description: "Choose from various AI models including GPT-4 and Gemini for optimal performance.",
-    },
-  ];
-
-  const capabilities = [
-    {
-      icon: <DatabaseOutlined className="text-2xl text-blue-500" />,
-      title: "Document Processing",
-      description: "Upload and process documents with automatic chunking and indexing for efficient retrieval.",
-    },
-    {
-      icon: <MessageOutlined className="text-2xl text-blue-500" />,
-      title: "Streaming Responses",
-      description: "Experience real-time, streaming responses for a more engaging conversation.",
-    },
-    {
-      icon: <ThunderboltOutlined className="text-2xl text-blue-500" />,
-      title: "Intelligent Prompting",
-      description: "Automatically generate and optimize prompts based on your specific requirements.",
-    },
-    {
-      icon: <GlobalOutlined className="text-2xl text-blue-500" />,
-      title: "Vector Storage",
-      description: "Efficient document storage and retrieval using advanced vector technology.",
-    },
-  ];
-
-  const testimonials = [
-    {
-      name: "Sarah Johnson",
-      role: "AI Developer",
-      content: "This platform has revolutionized how we create and deploy AI chatbots. The RAG capabilities are particularly impressive!",
-      avatar: "https://i.pravatar.cc/150?img=1",
-    },
-    {
-      name: "Michael Chen",
-      role: "Tech Lead",
-      content: "The custom chatbot creation process is intuitive and powerful. The streaming responses make for a great user experience.",
-      avatar: "https://i.pravatar.cc/150?img=2",
-    },
-    {
-      name: "Emma Davis",
-      role: "Product Manager",
-      content: "The document processing and vector storage features have significantly improved our chatbot's response quality.",
-      avatar: "https://i.pravatar.cc/150?img=3",
-    },
-  ];
+  const { t } = useTranslation();
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-indigo-50">
-      {/* Hero Section */}
-      <div className="relative overflow-hidden">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
-          <div className="text-center">
-            <h1 className="text-5xl md:text-6xl font-bold text-gray-900 mb-6">
-              Create Your Custom AI Chatbot
-            </h1>
-            <p className="text-xl text-gray-600 mb-8 max-w-3xl mx-auto">
-              Build powerful AI chatbots with RAG capabilities, document processing, and streaming responses.
-              Created by ABAOXOMTIEU to revolutionize AI chatbot development.
-            </p>
-            <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
+      {/* Header */}
+      <header className="bg-white/90 backdrop-blur-sm shadow-sm">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+          <div className="flex justify-between items-center">
+            <div className="flex items-center">
+              <h1 className="text-2xl font-bold text-gray-900">ABAOXOMTIEU</h1>
+            </div>
+            <div className="flex items-center gap-4">
+              <LanguageSwitcher />
               <Button
                 type="primary"
-                size="large"
-                className="bg-blue-600 hover:bg-blue-700 border-none px-8 h-12 text-lg"
                 onClick={() => navigate("/assistants")}
+                className="bg-blue-600 hover:bg-blue-700 border-none"
               >
-                Get Started
-                <ArrowRightOutlined className="ml-2" />
-              </Button>
-              <Button
-                size="large"
-                className="h-12 text-lg"
-                onClick={() => navigate("/create-prompt")}
-              >
-                Create Custom Bot
+                {t("landing.getStarted")}
               </Button>
             </div>
+          </div>
+        </div>
+      </header>
+
+      {/* Hero Section */}
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
+        <div className="text-center">
+          <h1 className="text-4xl sm:text-5xl md:text-6xl font-bold text-gray-900 mb-6">
+            {t("landing.title")}
+          </h1>
+          <p className="text-xl text-gray-600 mb-8 max-w-3xl mx-auto">
+            {t("landing.description")}
+          </p>
+          <div className="flex justify-center gap-4">
+            <Button
+              type="primary"
+              size="large"
+              onClick={() => navigate("/assistants")}
+              className="bg-blue-600 hover:bg-blue-700 border-none"
+            >
+              {t("landing.getStarted")}
+            </Button>
+            <Button
+              type="default"
+              size="large"
+              onClick={() => navigate("/assistants")}
+              className="text-blue-600 hover:text-blue-700"
+            >
+              {t("landing.startJourney")}
+            </Button>
           </div>
         </div>
       </div>
 
       {/* Features Section */}
-      <div className="py-20 bg-white">
+      <div className="bg-white py-20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-16">
-            <h2 className="text-3xl font-bold text-gray-900 mb-4">
-              Powerful Features for AI Chatbot Development
-            </h2>
-            <p className="text-xl text-gray-600">
-              Everything you need to create and deploy intelligent AI chatbots
-            </p>
-          </div>
+          <h2 className="text-3xl font-bold text-center text-gray-900 mb-12">
+            {t("landing.features.title")}
+          </h2>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            {features.map((feature, index) => (
-              <div
-                key={index}
-                className="p-6 rounded-xl bg-white shadow-sm hover:shadow-md transition-all duration-300"
-              >
-                <div className="mb-4">{feature.icon}</div>
-                <h3 className="text-xl font-semibold text-gray-900 mb-2">
-                  {feature.title}
-                </h3>
-                <p className="text-gray-600">{feature.description}</p>
-              </div>
-            ))}
+            <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-100">
+              <h3 className="text-xl font-semibold text-gray-900 mb-4">
+                {t("landing.features.customChatbot")}
+              </h3>
+              <p className="text-gray-600">
+                Create and customize your own AI chatbot with advanced
+                capabilities
+              </p>
+            </div>
+            <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-100">
+              <h3 className="text-xl font-semibold text-gray-900 mb-4">
+                {t("landing.features.ragProcessing")}
+              </h3>
+              <p className="text-gray-600">
+                Process and analyze documents with Retrieval-Augmented
+                Generation
+              </p>
+            </div>
+            <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-100">
+              <h3 className="text-xl font-semibold text-gray-900 mb-4">
+                {t("landing.features.multipleModels")}
+              </h3>
+              <p className="text-gray-600">
+                Choose from multiple AI models to power your chatbot
+              </p>
+            </div>
           </div>
         </div>
       </div>
 
       {/* Capabilities Section */}
-      <div className="py-20 bg-gray-50">
+      <div className="py-20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-16">
-            <h2 className="text-3xl font-bold text-gray-900 mb-4">
-              Advanced Capabilities
-            </h2>
-            <p className="text-xl text-gray-600">
-              Take your AI chatbots to the next level with these powerful features
-            </p>
-          </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-            {capabilities.map((capability, index) => (
-              <div
-                key={index}
-                className="p-6 rounded-xl bg-white shadow-sm hover:shadow-md transition-all duration-300"
-              >
-                <div className="mb-4">{capability.icon}</div>
-                <h3 className="text-lg font-semibold text-gray-900 mb-2">
-                  {capability.title}
-                </h3>
-                <p className="text-gray-600 text-sm">{capability.description}</p>
-              </div>
-            ))}
+          <h2 className="text-3xl font-bold text-center text-gray-900 mb-12">
+            {t("landing.capabilities.title")}
+          </h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+            <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-100">
+              <h3 className="text-xl font-semibold text-gray-900 mb-4">
+                {t("landing.capabilities.documentProcessing")}
+              </h3>
+              <p className="text-gray-600">
+                Process and analyze various document formats
+              </p>
+            </div>
+            <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-100">
+              <h3 className="text-xl font-semibold text-gray-900 mb-4">
+                {t("landing.capabilities.streamingResponses")}
+              </h3>
+              <p className="text-gray-600">
+                Get real-time streaming responses from your chatbot
+              </p>
+            </div>
+            <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-100">
+              <h3 className="text-xl font-semibold text-gray-900 mb-4">
+                {t("landing.capabilities.intelligentPrompting")}
+              </h3>
+              <p className="text-gray-600">
+                Generate intelligent prompts for better responses
+              </p>
+            </div>
+            <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-100">
+              <h3 className="text-xl font-semibold text-gray-900 mb-4">
+                {t("landing.capabilities.vectorStorage")}
+              </h3>
+              <p className="text-gray-600">
+                Store and retrieve information using vector databases
+              </p>
+            </div>
           </div>
         </div>
       </div>
 
       {/* Testimonials Section */}
-      <div className="py-20 bg-white">
+      <div className="bg-white py-20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-16">
-            <h2 className="text-3xl font-bold text-gray-900 mb-4">
-              What Our Users Say
-            </h2>
-            <p className="text-xl text-gray-600">
-              Join developers who have transformed their AI chatbot development
-            </p>
-          </div>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            {testimonials.map((testimonial, index) => (
-              <div
-                key={index}
-                className="p-6 rounded-xl bg-white shadow-sm hover:shadow-md transition-all duration-300"
-              >
-                <div className="flex items-center mb-4">
-                  <img
-                    src={testimonial.avatar}
-                    alt={testimonial.name}
-                    className="w-12 h-12 rounded-full mr-4"
-                  />
-                  <div>
-                    <h4 className="font-semibold text-gray-900">
-                      {testimonial.name}
-                    </h4>
-                    <p className="text-sm text-gray-600">{testimonial.role}</p>
-                  </div>
-                </div>
-                <p className="text-gray-600">{testimonial.content}</p>
-              </div>
-            ))}
-          </div>
-        </div>
-      </div>
-
-      {/* CTA Section */}
-      <div className="py-20 bg-gradient-to-r from-blue-600 to-indigo-600">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <h2 className="text-3xl font-bold text-white mb-4">
-            Ready to Build Your AI Chatbot?
+          <h2 className="text-3xl font-bold text-center text-gray-900 mb-4">
+            {t("landing.testimonials.title")}
           </h2>
-          <p className="text-xl text-blue-100 mb-8">
-            Start creating your custom AI chatbot with our powerful platform
+          <p className="text-xl text-gray-600 text-center mb-12">
+            {t("landing.testimonials.subtitle")}
           </p>
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Button
-              type="primary"
-              size="large"
-              className="bg-white text-blue-600 hover:bg-blue-50 border-none px-8 h-12 text-lg"
-              onClick={() => navigate("/assistants")}
-            >
-              View Existing Bots
-              <ArrowRightOutlined className="ml-2" />
-            </Button>
-            <Button
-              type="primary"
-              size="large"
-              className="bg-blue-500 text-white hover:bg-blue-400 border-none px-8 h-12 text-lg"
-              onClick={() => navigate("/create-prompt")}
-            >
-              Create New Bot
-              <ArrowRightOutlined className="ml-2" />
-            </Button>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-100">
+              <p className="text-gray-600 mb-4">
+                "Roboki has transformed how we handle customer support. The AI
+                chatbot is incredibly efficient and accurate."
+              </p>
+              <p className="font-semibold text-gray-900">John Doe</p>
+              <p className="text-gray-500">AI Developer</p>
+            </div>
+            <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-100">
+              <p className="text-gray-600 mb-4">
+                "The RAG capabilities are impressive. Our team can now process
+                documents much faster and more accurately."
+              </p>
+              <p className="font-semibold text-gray-900">Jane Smith</p>
+              <p className="text-gray-500">Tech Lead</p>
+            </div>
+            <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-100">
+              <p className="text-gray-600 mb-4">
+                "The multiple model support gives us flexibility to choose the
+                best AI for our specific needs."
+              </p>
+              <p className="font-semibold text-gray-900">Mike Johnson</p>
+              <p className="text-gray-500">Product Manager</p>
+            </div>
           </div>
         </div>
       </div>
 
       {/* Footer */}
-      <footer className="bg-gray-900 text-white py-12">
+      <footer className="bg-gray-50 py-12">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
             <div>
-              <h3 className="text-lg font-semibold mb-4">About Us</h3>
-              <p className="text-gray-400">
-                Created by ABAOXOMTIEU, we're revolutionizing AI chatbot development with advanced features and powerful capabilities.
+              <h3 className="text-lg font-semibold text-gray-900 mb-4">
+                Roboki
+              </h3>
+              <p className="text-gray-600">
+                Building the future of AI-powered conversations
               </p>
             </div>
             <div>
-              <h3 className="text-lg font-semibold mb-4">Quick Links</h3>
+              <h4 className="text-sm font-semibold text-gray-900 mb-4">
+                Product
+              </h4>
               <ul className="space-y-2">
                 <li>
-                  <a href="#" className="text-gray-400 hover:text-white">
-                    Home
-                  </a>
-                </li>
-                <li>
-                  <a href="#" className="text-gray-400 hover:text-white">
+                  <a href="#" className="text-gray-600 hover:text-blue-600">
                     Features
                   </a>
                 </li>
                 <li>
-                  <a href="#" className="text-gray-400 hover:text-white">
+                  <a href="#" className="text-gray-600 hover:text-blue-600">
+                    Pricing
+                  </a>
+                </li>
+                <li>
+                  <a href="#" className="text-gray-600 hover:text-blue-600">
                     Documentation
                   </a>
                 </li>
               </ul>
             </div>
             <div>
-              <h3 className="text-lg font-semibold mb-4">Contact</h3>
+              <h4 className="text-sm font-semibold text-gray-900 mb-4">
+                Company
+              </h4>
               <ul className="space-y-2">
-                <li className="text-gray-400">Email: contact@example.com</li>
-                <li className="text-gray-400">GitHub: github.com/abaoxomtieu</li>
+                <li>
+                  <a href="#" className="text-gray-600 hover:text-blue-600">
+                    About
+                  </a>
+                </li>
+                <li>
+                  <a href="#" className="text-gray-600 hover:text-blue-600">
+                    Blog
+                  </a>
+                </li>
+                <li>
+                  <a href="#" className="text-gray-600 hover:text-blue-600">
+                    Careers
+                  </a>
+                </li>
               </ul>
             </div>
             <div>
-              <h3 className="text-lg font-semibold mb-4">Follow Us</h3>
-              <div className="flex space-x-4">
-                <a href="#" className="text-gray-400 hover:text-white">
-                  <TeamOutlined className="text-xl" />
-                </a>
-                <a href="#" className="text-gray-400 hover:text-white">
-                  <StarOutlined className="text-xl" />
-                </a>
-              </div>
+              <h4 className="text-sm font-semibold text-gray-900 mb-4">
+                Legal
+              </h4>
+              <ul className="space-y-2">
+                <li>
+                  <a href="#" className="text-gray-600 hover:text-blue-600">
+                    Privacy
+                  </a>
+                </li>
+                <li>
+                  <a href="#" className="text-gray-600 hover:text-blue-600">
+                    Terms
+                  </a>
+                </li>
+                <li>
+                  <a href="#" className="text-gray-600 hover:text-blue-600">
+                    Security
+                  </a>
+                </li>
+              </ul>
             </div>
           </div>
-          <div className="border-t border-gray-800 mt-8 pt-8 text-center text-gray-400">
-            <p>© 2024 ABAOXOMTIEU. All rights reserved.</p>
+          <div className="mt-8 pt-8 border-t border-gray-200">
+            <p className="text-center text-gray-500">
+              © 2024 Roboki. All rights reserved.
+            </p>
           </div>
         </div>
       </footer>
@@ -298,4 +269,4 @@ const LandingPage: React.FC = () => {
   );
 };
 
-export default LandingPage; 
+export default LandingPage;
