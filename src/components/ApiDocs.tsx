@@ -1,6 +1,7 @@
-import React from 'react';
-import { Modal, Typography, Divider, Space, Tag, Alert } from 'antd';
-import { CodeOutlined } from '@ant-design/icons';
+import React from "react";
+import { Modal, Typography, Divider, Space, Tag, Alert } from "antd";
+import { CodeOutlined } from "@ant-design/icons";
+import { ApiDomain } from "../constants";
 
 const { Title, Text, Paragraph } = Typography;
 
@@ -11,7 +12,7 @@ interface ApiDocsProps {
 }
 
 const ApiDocs: React.FC<ApiDocsProps> = ({ isVisible, onClose, botId }) => {
-  const apiUrl = `${window.location.origin}/ai/rag_agent_template/stream`;
+  const apiUrl = `${ApiDomain}/ai/rag_agent_template/stream`;
   const exampleCode = `// Example using fetch
 const response = await fetch('${apiUrl}', {
   method: 'POST',
@@ -88,15 +89,19 @@ while (true) {
         <Title level={4}>Request Body</Title>
         <Paragraph>
           <pre className="bg-gray-50 p-4 rounded-lg">
-            {JSON.stringify({
-              query: {
-                role: "user",
-                content: "Your message here"
+            {JSON.stringify(
+              {
+                query: {
+                  role: "user",
+                  content: "Your message here",
+                },
+                bot_id: botId,
+                conversation_id: "optional_conversation_id",
+                model_name: "gemini-2.5-flash-preview-05-20",
               },
-              bot_id: botId,
-              conversation_id: "optional_conversation_id",
-              model_name: "gemini-2.5-flash-preview-05-20"
-            }, null, 2)}
+              null,
+              2
+            )}
           </pre>
         </Paragraph>
 
@@ -116,7 +121,11 @@ while (true) {
           </div>
           <div>
             <Tag color="blue">model_name</Tag>
-            <Text> Choose between "gemini-2.5-flash-preview-05-20" or "gemini-2.0-flash"</Text>
+            <Text>
+              {" "}
+              Choose between "gemini-2.5-flash-preview-05-20" or
+              "gemini-2.0-flash"
+            </Text>
           </div>
         </Space>
 
@@ -124,26 +133,33 @@ while (true) {
 
         <Title level={4}>Response Format</Title>
         <Paragraph>
-          The API uses Server-Sent Events (SSE) for streaming responses. Each response is a JSON object with the following structure:
+          The API uses Server-Sent Events (SSE) for streaming responses. Each
+          response is a JSON object with the following structure:
         </Paragraph>
         <pre className="bg-gray-50 p-4 rounded-lg">
-          {JSON.stringify({
-            type: "message",
-            content: "Streaming message content..."
-          }, null, 2)}
+          {JSON.stringify(
+            {
+              type: "message",
+              content: "Streaming message content...",
+            },
+            null,
+            2
+          )}
         </pre>
-        <Paragraph>
-          Final response format:
-        </Paragraph>
+        <Paragraph>Final response format:</Paragraph>
         <pre className="bg-gray-50 p-4 rounded-lg">
-          {JSON.stringify({
-            type: "final",
-            content: {
-              final_response: "Complete response message",
-              selected_ids: [],
-              selected_documents: []
-            }
-          }, null, 2)}
+          {JSON.stringify(
+            {
+              type: "final",
+              content: {
+                final_response: "Complete response message",
+                selected_ids: [],
+                selected_documents: [],
+              },
+            },
+            null,
+            2
+          )}
         </pre>
 
         <Divider />
@@ -165,4 +181,4 @@ while (true) {
   );
 };
 
-export default ApiDocs; 
+export default ApiDocs;
