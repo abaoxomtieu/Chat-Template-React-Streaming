@@ -1,29 +1,25 @@
 import React, { useState, useEffect } from "react";
+import { Card, Button, Input, Skeleton, message, Modal } from "antd";
 import {
-  Card,
-  List,
-  Avatar,
-  Tag,
-  Button,
-  Skeleton,
-  Typography,
-  message,
-} from "antd";
-import {
-  RobotOutlined,
-  ArrowRightOutlined,
-  ToolOutlined,
-  EditOutlined,
   PlusOutlined,
+  SearchOutlined,
+  RobotOutlined,
+  ThunderboltOutlined,
+  MessageOutlined,
+  LeftOutlined,
+  DeleteOutlined,
 } from "@ant-design/icons";
 import { useNavigate } from "react-router-dom";
-import { fetchChatbots, Chatbot } from "../services/chatbotService";
+import { fetchChatbots, deleteChatbot, Chatbot } from "../services/chatbotService";
 
-const { Title, Paragraph } = Typography;
+const { Search } = Input;
 
 const ChatbotList: React.FC = () => {
   const [chatbots, setChatbots] = useState<Chatbot[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [deleteModalVisible, setDeleteModalVisible] = useState(false);
+  const [chatbotToDelete, setChatbotToDelete] = useState<string | null>(null);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -43,139 +39,205 @@ const ChatbotList: React.FC = () => {
     loadChatbots();
   }, []);
 
-  const handleChatbotSelect = (chatbot: Chatbot) => {
-    // Navigate to the RAG Agent page with the selected botId
-    navigate(`/rag-agent?botId=${chatbot.id}`);
+  const filteredChatbots = chatbots.filter((bot) =>
+    bot.name.toLowerCase().includes(searchQuery.toLowerCase())
+  );
+
+  const handleSearch = (value: string) => {
+    setSearchQuery(value);
   };
 
-  const handleEditChatbot = (chatbot: Chatbot, event: React.MouseEvent) => {
-    // Prevent the card click from triggering
-    event.stopPropagation();
-    // Navigate to the chatbot editor page
-    navigate(`/chatbot-editor/${chatbot.id}`);
+  const handleCreateChatbot = () => {
+    navigate("/create-prompt")
+  };
+
+  const handleChatbotClick = (botId: string) => {
+    navigate(`/rag-agent?botId=${botId}`);
+  };
+
+  const handleDeleteClick = (e: React.MouseEvent, botId: string) => {
+    e.stopPropagation(); // Prevent card click event
+    setChatbotToDelete(botId);
+    setDeleteModalVisible(true);
+  };
+
+  const handleDeleteConfirm = async () => {
+    if (!chatbotToDelete) return;
+
+    try {
+      await deleteChatbot(chatbotToDelete);
+      message.success("Chatbot deleted successfully");
+      setChatbots(chatbots.filter(bot => bot.id !== chatbotToDelete));
+    } catch (error) {
+      message.error("Failed to delete chatbot");
+      console.error("Error deleting chatbot:", error);
+    } finally {
+      setDeleteModalVisible(false);
+      setChatbotToDelete(null);
+    }
+  };
+
+  const renderSkeletonCards = () => {
+    return Array(6)
+      .fill(null)
+      .map((_, index) => (
+        <Card
+          key={index}
+          className="h-full transform hover:scale-105 transition-all duration-300"
+        >
+          <div className="flex items-start gap-4">
+            <div className="flex-shrink-0">
+              <Skeleton.Avatar active size={48} shape="circle" />
+            </div>
+            <div className="flex-1">
+              <Skeleton.Input active size="large" block className="mb-2" />
+              <Skeleton paragraph={{ rows: 2 }} active className="mb-4" />
+              <div className="flex items-center gap-4">
+                <Skeleton.Button active size="small" />
+                <Skeleton.Button active size="small" />
+              </div>
+            </div>
+          </div>
+        </Card>
+      ));
+  };
+
+  const renderEmptyState = () => {
+    return (
+      <div className="text-center py-16 bg-white rounded-xl shadow-sm border border-gray-100">
+        <RobotOutlined className="text-6xl text-blue-500 mb-4" />
+        <h3 className="text-xl font-semibold text-gray-800 mb-2">
+          No AI Assistants Found
+        </h3>
+        <p className="text-gray-600 mb-6 max-w-md mx-auto">
+          Create your first AI assistant to start having intelligent
+          conversations about your travel destinations.
+        </p>
+        <Button
+          type="primary"
+          size="large"
+          icon={<PlusOutlined />}
+          onClick={handleCreateChatbot}
+          className="bg-blue-600 hover:bg-blue-700 border-none"
+        >
+          Create New Assistant
+        </Button>
+      </div>
+    );
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-indigo-50 via-white to-purple-50 p-4 sm:p-6 md:p-8">
-      <div className="max-w-6xl mx-auto">
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-indigo-50 py-8 px-4">
+      <div className="max-w-7xl mx-auto">
+        {/* Header Section */}
         <div className="text-center mb-8">
-          <div className="flex justify-between items-center mb-4">
-            <div className="flex-1"></div>
-            <Title
-              level={2}
-              className="bg-gradient-to-r from-purple-600 to-indigo-600 bg-clip-text text-transparent"
-            >
-              Available Chatbots
-            </Title>
-            <div className="flex-1 flex justify-end">
-              <Button
-                type="primary"
-                icon={<PlusOutlined />}
-                onClick={() => navigate("/create-prompt")}
-                className="bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700"
-                size="large"
-              >
-                Create New Chatbot
-              </Button>
-            </div>
-          </div>
-          <Paragraph className="text-gray-600 max-w-2xl mx-auto">
-            Choose from our collection of specialized AI assistants designed to
-            help with different tasks
-          </Paragraph>
+          <h1 className="text-4xl font-bold text-gray-800 mb-4">
+            Your AI Assistants
+          </h1>
+          <p className="text-lg text-gray-600 max-w-2xl mx-auto">
+            Create and manage your AI assistants to help with travel planning,
+            destination information, and more.
+          </p>
         </div>
 
-        <List
-          grid={{
-            gutter: 16,
-            xs: 1,
-            sm: 1,
-            md: 2,
-            lg: 3,
-            xl: 3,
-            xxl: 3,
-          }}
-          dataSource={chatbots}
-          loading={loading}
-          renderItem={(chatbot) => (
-            <List.Item>
-              <Card
-                hoverable
-                className="h-full border border-purple-100 shadow-sm hover:shadow-md transition-shadow duration-200"
-                style={{ width: '100%', height: 280 }}
-                actions={[
-                  <Button
-                    icon={<EditOutlined />}
-                    onClick={(e) => handleEditChatbot(chatbot, e)}
-                  >
-                    Edit
-                  </Button>,
-                  <Button
-                    type="primary"
-                    icon={<ArrowRightOutlined />}
-                    onClick={() => handleChatbotSelect(chatbot)}
-                    className="bg-gradient-to-r from-purple-600 to-indigo-600"
-                  >
-                    Start Chat
-                  </Button>,
-                ]}
-              >
-                <Skeleton loading={loading} avatar active>
-                  <Card.Meta
-                    avatar={
-                      <Avatar
-                        size={64}
-                        icon={<RobotOutlined />}
-                        className="bg-gradient-to-r from-purple-500 to-indigo-500"
-                      />
-                    }
-                    title={
-                      <span className="text-lg font-medium">
-                        {chatbot.name}
-                      </span>
-                    }
-                    description={
-                      <div className="h-32 overflow-hidden">
-                        <Paragraph
-                          ellipsis={{ rows: 3 }}
-                          className="text-gray-600 mb-3"
-                        >
-                          {chatbot.prompt.substring(0, 150)}...
-                        </Paragraph>
-                        {chatbot.tools && chatbot.tools.length > 0 && (
-                          <div className="mt-2">
-                            <Tag icon={<ToolOutlined />} color="blue">
-                              {chatbot.tools.length} Tools Available
-                            </Tag>
-                          </div>
-                        )}
-                        <div className="mt-2 text-xs text-gray-400">
-                          ID: {chatbot.id}
-                        </div>
-                      </div>
-                    }
-                  />
-                </Skeleton>
-              </Card>
-            </List.Item>
-          )}
-        />
+        {/* Search and Create Section */}
+        <div className="flex flex-col md:flex-row justify-between items-center gap-4 mb-8">
+          <Search
+            placeholder="Search assistants..."
+            allowClear
+            enterButton={<SearchOutlined />}
+            size="large"
+            className="w-full md:w-96"
+            onChange={(e) => handleSearch(e.target.value)}
+          />
+          <Button
+            type="primary"
+            size="large"
+            icon={<PlusOutlined />}
+            onClick={handleCreateChatbot}
+            className="bg-blue-600 hover:bg-blue-700 border-none whitespace-nowrap"
+          >
+            Create New Assistant
+          </Button>
+        </div>
 
-        {!loading && chatbots.length === 0 && (
-          <div className="text-center p-8 bg-white rounded-lg shadow-sm border border-purple-100">
-            <RobotOutlined
-              style={{ fontSize: 48 }}
-              className="text-gray-300 mb-4"
-            />
-            <Title level={4} className="text-gray-500">
-              No Chatbots Available
-            </Title>
-            <Paragraph className="text-gray-400">
-              There are currently no chatbots configured in the system.
-            </Paragraph>
-          </div>
-        )}
+        {/* Chatbots Grid */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {loading ? (
+            renderSkeletonCards()
+          ) : filteredChatbots.length > 0 ? (
+            filteredChatbots.map((bot) => (
+              <Card
+                key={bot.id}
+                hoverable
+                className="h-full transform hover:scale-105 transition-all duration-300"
+                onClick={() => handleChatbotClick(bot.id)}
+              >
+                <div className="flex items-start gap-4">
+                  <div className="flex-shrink-0">
+                    <div className="w-12 h-12 rounded-full bg-gradient-to-r from-blue-500 to-indigo-500 flex items-center justify-center">
+                      <RobotOutlined className="text-2xl text-white" />
+                    </div>
+                  </div>
+                  <div className="flex-1">
+                    <div className="flex justify-between items-start">
+                      <h3 className="text-lg font-semibold text-gray-800 mb-2">
+                        {bot.name}
+                      </h3>
+                      <Button
+                        type="text"
+                        danger
+                        icon={<DeleteOutlined />}
+                        onClick={(e) => handleDeleteClick(e, bot.id)}
+                        className="hover:bg-red-50"
+                      />
+                    </div>
+                    <p className="text-gray-600 text-sm mb-4 line-clamp-2">
+                      {bot.prompt}
+                    </p>
+                    <div className="flex items-center gap-4 text-sm text-gray-500">
+                      <div className="flex items-center gap-1">
+                        <ThunderboltOutlined />
+                        <span>AI Powered</span>
+                      </div>
+                      <div className="flex items-center gap-1">
+                        <MessageOutlined />
+                        <span>Chat Enabled</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </Card>
+            ))
+          ) : (
+            <div className="col-span-full">{renderEmptyState()}</div>
+          )}
+        </div>
+
+        <Button
+          type="text"
+          icon={<LeftOutlined />}
+          onClick={() => navigate("/")}
+          className="text-gray-600 hover:text-blue-600"
+        >
+          Back
+        </Button>
       </div>
+
+      <Modal
+        title="Delete Chatbot"
+        open={deleteModalVisible}
+        onOk={handleDeleteConfirm}
+        onCancel={() => {
+          setDeleteModalVisible(false);
+          setChatbotToDelete(null);
+        }}
+        okText="Delete"
+        okButtonProps={{ danger: true }}
+        cancelText="Cancel"
+      >
+        <p>Are you sure you want to delete this chatbot? This action cannot be undone.</p>
+      </Modal>
     </div>
   );
 };

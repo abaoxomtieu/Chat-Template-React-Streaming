@@ -68,3 +68,19 @@ export const updateChatbot = async (id: string, updateData: ChatbotUpdateRequest
     throw error;
   }
 };
+
+export const deleteChatbot = async (id: string): Promise<void> => {
+  try {
+    const response = await fetch(`${BASE_API_URL}/chatbots/${id}`, {
+      method: 'DELETE',
+    });
+
+    if (!response.ok) {
+      const error = await response.json();
+      throw new Error(error.error || 'Failed to delete chatbot');
+    }
+  } catch (error) {
+    console.error('Error deleting chatbot:', error);
+    throw error;
+  }
+};

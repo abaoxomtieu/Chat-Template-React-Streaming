@@ -6,7 +6,6 @@ import {
   Switch,
   Card,
   Collapse,
-  Tag,
   Button,
   Image,
   Modal,
@@ -20,11 +19,14 @@ import {
   DeleteOutlined,
   ThunderboltOutlined,
   RobotOutlined,
-  InfoCircleOutlined,
   PictureOutlined,
   CloseCircleOutlined,
   EditOutlined,
   LeftOutlined,
+  MenuFoldOutlined,
+  MenuUnfoldOutlined,
+  MessageOutlined,
+  PlusOutlined,
 } from "@ant-design/icons";
 import FileUploadButton from "../components/FileUploadButton";
 import ChatMessageAgent from "../components/ChatMessageAgent";
@@ -95,6 +97,7 @@ const RagAgent: React.FC = () => {
   const [conversationId, setConversationId] = useState<string>("");
   const [conversations, setConversations] = useState<ConversationMeta[]>([]);
   const [modelName, setModelName] = useState<string>(modelOptions[0].value);
+  const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
 
   useEffect(() => {
     const botIdFromUrl = searchParams.get("botId");
@@ -500,93 +503,351 @@ const RagAgent: React.FC = () => {
   };
 
   return (
-    <div className="flex flex-col h-screen bg-gradient-to-br from-purple-50 to-indigo-50">
-      {/* Conversation List Sidebar/Header */}
-      <div className="flex-none bg-white/80 backdrop-blur-sm shadow-sm border-b border-purple-100 py-2">
-        <div className="max-w-3xl mx-auto flex items-center gap-2 px-4">
-          <Button type="primary" onClick={createConversation} size="small">
-            + New Conversation
-          </Button>
-          {conversations.map((conv) => (
-            <div
-              key={conv.conversation_id}
-              className={`flex items-center gap-1 px-2 py-1 rounded cursor-pointer ${
-                conversationId === conv.conversation_id ? "bg-purple-100" : ""
-              }`}
-              onClick={() => selectConversation(conv.conversation_id)}
-            >
-              <span className="text-sm font-medium">{conv.name}</span>
-              <Button
-                type="text"
-                size="small"
-                danger
-                onClick={(e) => {
-                  e.stopPropagation();
-                  deleteConversation(conv.conversation_id);
-                }}
-              >
-                <DeleteOutlined />
-              </Button>
-            </div>
-          ))}
-        </div>
-      </div>
-      {/* Edit Chatbot Modal */}
-      <ChatbotEditModal
-        isVisible={isEditModalVisible}
-        onClose={closeEditModal}
-        chatbot={chatbotDetails}
-        onSuccess={handleChatbotUpdate}
-      />
-      {/* Header */}
-      <div className="flex-none bg-white/80 backdrop-blur-sm shadow-sm border-b border-purple-100 py-4">
-        <div className="max-w-3xl mx-auto flex justify-between items-center px-4">
-          <div className="flex items-center gap-3">
+    <div className="flex h-screen bg-gradient-to-br from-blue-50 via-white to-indigo-50">
+      {/* Conversation Sidebar */}
+      <div
+        className={`flex-none bg-white/90 backdrop-blur-sm border-r border-gray-100 transition-all duration-300 ${
+          isSidebarCollapsed ? "w-16" : "w-64"
+        }`}
+      >
+        <div className="flex flex-col h-full">
+          {/* Sidebar Header */}
+          <div className="flex items-center justify-between p-4 border-b border-gray-100">
+            {!isSidebarCollapsed && (
+              <span className="text-sm font-medium text-gray-700">
+                Conversations
+              </span>
+            )}
             <Button
               type="text"
-              icon={<LeftOutlined />}
-              onClick={() => navigate("/")}
-              className="mr-1"
-            >
-              Back
-            </Button>
-            <Avatar
-              icon={<RobotOutlined />}
-              className="bg-gradient-to-r from-purple-600 to-indigo-600 text-white"
-              size={40}
+              icon={
+                isSidebarCollapsed ? (
+                  <MenuUnfoldOutlined />
+                ) : (
+                  <MenuFoldOutlined />
+                )
+              }
+              onClick={() => setIsSidebarCollapsed(!isSidebarCollapsed)}
+              className="text-gray-600 hover:text-blue-600"
             />
-            <div>
-              <h1 className="text-xl font-bold text-gray-800">
-                {chatbotDetails?.name || "AI Assistant"}
-              </h1>
-              <p className="text-sm text-gray-500">
-                Ask me anything about travel destinations
-              </p>
+          </div>
+
+          {/* Conversation List */}
+          <div className="flex-1 overflow-y-auto p-2">
+            <div className="space-y-2">
+              {!isSidebarCollapsed && (
+                <Button
+                  type="primary"
+                  onClick={createConversation}
+                  size="small"
+                  className="w-full bg-blue-600 hover:bg-blue-700 border-none"
+                  icon={<PlusOutlined />}
+                >
+                  New Conversation
+                </Button>
+              )}
+              {conversations.map((conv) => (
+                <div
+                  key={conv.conversation_id}
+                  className={`flex items-center gap-2 p-2 rounded-lg cursor-pointer transition-all duration-200 ${
+                    conversationId === conv.conversation_id
+                      ? "bg-blue-100 text-blue-700"
+                      : "hover:bg-gray-50 text-gray-600"
+                  }`}
+                  onClick={() => selectConversation(conv.conversation_id)}
+                >
+                  <MessageOutlined className="text-lg" />
+                  {!isSidebarCollapsed && (
+                    <>
+                      <span className="flex-1 text-sm font-medium truncate">
+                        {conv.name}
+                      </span>
+                      <Button
+                        type="text"
+                        size="small"
+                        danger
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          deleteConversation(conv.conversation_id);
+                        }}
+                        className="p-1 hover:bg-red-50"
+                      >
+                        <DeleteOutlined />
+                      </Button>
+                    </>
+                  )}
+                </div>
+              ))}
             </div>
           </div>
-          <div className="flex items-center gap-2">
-            <Button
-              type="primary"
-              icon={<EditOutlined />}
-              onClick={openEditModal}
-            >
-              Edit
-            </Button>
-            <Button
-              type="primary"
-              danger
-              icon={<DeleteOutlined />}
-              onClick={clearHistory}
-            >
-              Clear
-            </Button>
-            <Select
-              value={modelName}
-              onChange={setModelName}
-              style={{ width: 180 }}
-              options={modelOptions}
-              className="mr-2"
-            />
+        </div>
+      </div>
+
+      {/* Main Content */}
+      <div className="flex-1 flex flex-col">
+        {/* Header */}
+        <div className="flex-none bg-white/90 backdrop-blur-sm shadow-sm border-b border-gray-100 py-4">
+          <div className="max-w-4xl mx-auto flex justify-between items-center px-4">
+            <div className="flex items-center gap-3">
+              <Button
+                type="text"
+                icon={<LeftOutlined />}
+                onClick={() => navigate("/")}
+                className="text-gray-600 hover:text-blue-600"
+              >
+                Back
+              </Button>
+              <Avatar
+                icon={<RobotOutlined />}
+                className="bg-gradient-to-r from-blue-500 to-indigo-500 text-white"
+                size={40}
+              />
+              <div>
+                <h1 className="text-xl font-semibold text-gray-800">
+                  {chatbotDetails?.name || "AI Assistant"}
+                </h1>
+                <p className="text-sm text-gray-500">
+                  Ask me anything about travel destinations
+                </p>
+              </div>
+            </div>
+            <div className="flex items-center gap-2">
+              <Button
+                type="primary"
+                icon={<EditOutlined />}
+                onClick={openEditModal}
+                className="bg-blue-600 hover:bg-blue-700 border-none"
+              >
+                Edit
+              </Button>
+              <Button
+                type="primary"
+                danger
+                icon={<DeleteOutlined />}
+                onClick={clearHistory}
+                className="bg-red-500 hover:bg-red-600 border-none"
+              >
+                Clear
+              </Button>
+              <Select
+                value={modelName}
+                onChange={setModelName}
+                style={{ width: 180 }}
+                options={modelOptions}
+                className="mr-2"
+              />
+            </div>
+          </div>
+        </div>
+
+        {/* Chat Messages */}
+        <div className="flex-1 overflow-y-auto py-4 px-4">
+          <div className="max-w-4xl mx-auto space-y-6">
+            {messages.length === 0 ? (
+              <div className="text-center py-10">
+                <div className="bg-white rounded-xl p-8 shadow-sm border border-gray-100">
+                  {loadingChatbot ? (
+                    <Skeleton active avatar paragraph={{ rows: 3 }} />
+                  ) : (
+                    <>
+                      <RobotOutlined className="text-4xl text-blue-500 mb-4" />
+                      <h3 className="text-lg font-medium text-gray-800 mb-2">
+                        {chatbotDetails?.name || "AI Assistant"}
+                      </h3>
+                      <p className="text-gray-600 mb-6">
+                        {chatbotDetails?.prompt?.substring(0, 150) + "..." ||
+                          "Ask me anything about travel destinations, plan your trips, or inquire about images of places."}
+                      </p>
+                    </>
+                  )}
+                  <RecommendationContainer
+                    title="Example Questions"
+                    recommendations={travelGuideRecommendations}
+                    onRecommendationClick={(recommendation) =>
+                      setInput(recommendation)
+                    }
+                  />
+                </div>
+              </div>
+            ) : (
+              messages.map((msg: StructuredMessage, index: number) => {
+                const displayMessage = {
+                  role: msg.role,
+                  content:
+                    msg.displayContent ||
+                    (typeof msg.content === "string" ? msg.content : ""),
+                };
+                return (
+                  <ChatMessageAgent key={index} message={displayMessage} />
+                );
+              })
+            )}
+
+            {/* Streaming Message */}
+            {streamingMessage && (
+              <div className="flex justify-center">
+                <div className="bg-gray-50 rounded-2xl py-4 w-2/3 animate-pulse">
+                  <div className="max-w-4xl mx-auto flex gap-4 px-4">
+                    <Avatar
+                      icon={<RobotOutlined />}
+                      className="bg-blue-500 text-white"
+                      size={32}
+                    />
+                    <div className="flex-1 text-gray-800 text-sm leading-relaxed">
+                      <div className="w-full">
+                        <ReactMarkdown
+                          components={{
+                            img: ({ node, src, alt, ...props }) => (
+                              <img
+                                src={src}
+                                alt={alt || "Image"}
+                                className="my-2 max-w-full rounded-md"
+                                {...props}
+                              />
+                            ),
+                          }}
+                        >
+                          {streamingMessage}
+                        </ReactMarkdown>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* Source Documents */}
+            {selectedDocuments.length > 0 && (
+              <div className="mt-4">
+                <Collapse
+                  className="bg-white/80 border border-gray-100 rounded-xl overflow-hidden"
+                  expandIconPosition="end"
+                >
+                  <Panel
+                    header={
+                      <span className="text-gray-700 font-medium">
+                        Source Documents ({selectedDocuments.length})
+                      </span>
+                    }
+                    key="1"
+                  >
+                    <List
+                      dataSource={selectedDocuments}
+                      renderItem={(doc) => (
+                        <List.Item>
+                          <div className="w-full">
+                            <div className="flex items-start gap-3">
+                              <div className="flex-1">
+                                <div className="text-sm text-gray-600 mb-1">
+                                  {doc.metadata?.content || doc.page_content}
+                                </div>
+                                {doc.metadata?.source && (
+                                  <div className="text-xs text-gray-400">
+                                    Source: {doc.metadata.source}
+                                  </div>
+                                )}
+                              </div>
+                            </div>
+                          </div>
+                        </List.Item>
+                      )}
+                    />
+                  </Panel>
+                </Collapse>
+              </div>
+            )}
+          </div>
+        </div>
+
+        {/* Input Area */}
+        <div className="flex-none p-4 border-t border-gray-100 bg-white/90 backdrop-blur-sm">
+          <div className="max-w-4xl mx-auto">
+            <div className="flex justify-between items-center mb-2">
+              <div className="flex items-center gap-2">
+                <Switch
+                  checked={isStreaming}
+                  onChange={() => setIsStreaming(!isStreaming)}
+                  size="small"
+                  className="bg-gray-200"
+                />
+                <span className="text-xs text-gray-600 flex items-center gap-1">
+                  <ThunderboltOutlined />
+                  Streaming {isStreaming ? "On" : "Off"}
+                </span>
+
+                <FileUploadButton
+                  botId={botId}
+                  onUploadSuccess={(result) => {
+                    message.success(
+                      `Successfully processed ${result.file_path} with ${result.chunks_count} chunks`
+                    );
+                  }}
+                />
+              </div>
+              {availableImages.length > 0 && (
+                <Button
+                  type="default"
+                  size="small"
+                  icon={<PictureOutlined />}
+                  onClick={openImageModal}
+                  className="text-gray-600 hover:text-blue-600"
+                >
+                  Select Image from Sources
+                </Button>
+              )}
+            </div>
+
+            {/* Selected Image Preview */}
+            {selectedImage && (
+              <div className="mb-3 relative">
+                <div className="rounded-lg overflow-hidden border border-gray-200">
+                  <Image
+                    src={selectedImage}
+                    alt="Selected image"
+                    className="max-h-[150px] w-auto mx-auto"
+                    preview={false}
+                  />
+                </div>
+                <Button
+                  type="text"
+                  danger
+                  icon={<CloseCircleOutlined />}
+                  size="small"
+                  className="absolute top-1 right-1 bg-white/80 rounded-full hover:bg-red-50"
+                  onClick={clearSelectedImage}
+                />
+              </div>
+            )}
+
+            <div className="flex items-end gap-2">
+              <div className="flex-1">
+                <TextArea
+                  ref={inputRef}
+                  placeholder={
+                    selectedImage
+                      ? "Ask about this image..."
+                      : "Ask me about travel destinations..."
+                  }
+                  value={input}
+                  onChange={(e) => setInput(e.target.value)}
+                  onKeyDown={handleKeyPress}
+                  autoSize={{ minRows: 1, maxRows: 4 }}
+                  disabled={loading}
+                  className="rounded-xl border-gray-200 focus:border-blue-400 focus:ring focus:ring-blue-200 focus:ring-opacity-50 resize-none"
+                />
+              </div>
+              <button
+                onClick={handleSend}
+                disabled={loading || (!input.trim() && !selectedImage)}
+                className={`p-3 rounded-full transition-all duration-200 ${
+                  loading || (!input.trim() && !selectedImage)
+                    ? "bg-gray-100 text-gray-400 cursor-not-allowed"
+                    : "bg-blue-600 text-white shadow-sm hover:bg-blue-700 hover:shadow-md"
+                }`}
+              >
+                <SendOutlined className="text-lg" />
+              </button>
+            </div>
           </div>
         </div>
       </div>
@@ -598,6 +859,7 @@ const RagAgent: React.FC = () => {
         onCancel={closeImageModal}
         footer={null}
         width={700}
+        className="rounded-xl"
       >
         <List
           grid={{ gutter: 16, column: 2 }}
@@ -606,16 +868,13 @@ const RagAgent: React.FC = () => {
             <List.Item>
               <Card
                 hoverable
+                className="border border-gray-100 rounded-xl overflow-hidden"
                 cover={
-                  <div style={{ height: 200, overflow: "hidden" }}>
+                  <div className="h-48 overflow-hidden">
                     <Image
                       alt="Travel destination"
                       src={image.url}
-                      style={{
-                        width: "100%",
-                        height: "100%",
-                        objectFit: "cover",
-                      }}
+                      className="w-full h-full object-cover"
                     />
                   </div>
                 }
@@ -631,235 +890,13 @@ const RagAgent: React.FC = () => {
         />
       </Modal>
 
-      {/* Chat Messages */}
-      <div className="flex-1 overflow-y-auto py-4 px-4">
-        <div className="max-w-3xl mx-auto space-y-6">
-          {messages.length === 0 ? (
-            <div className="text-center py-10">
-              <div className="bg-white rounded-xl p-6 shadow-sm border border-purple-100">
-                {loadingChatbot ? (
-                  <Skeleton active avatar paragraph={{ rows: 3 }} />
-                ) : (
-                  <>
-                    <RobotOutlined className="text-4xl text-purple-500 mb-2" />
-                    <h3 className="text-lg font-medium text-gray-800 mb-1">
-                      {chatbotDetails?.name || "AI Assistant"}
-                    </h3>
-                    <p className="text-gray-600 mb-4">
-                      {chatbotDetails?.prompt?.substring(0, 150) + "..." ||
-                        "Ask me anything about travel destinations, plan your trips, or inquire about images of places."}
-                    </p>
-                  </>
-                )}
-                <RecommendationContainer
-                  title="Example Questions"
-                  recommendations={travelGuideRecommendations}
-                  onRecommendationClick={(recommendation) =>
-                    setInput(recommendation)
-                  }
-                />
-              </div>
-            </div>
-          ) : (
-            messages.map((msg: StructuredMessage, index: number) => {
-              // Use the structured message directly with ChatMessageAgent
-              // If displayContent is available, use it for rendering, otherwise use content
-              const displayMessage = {
-                role: msg.role,
-                content:
-                  msg.displayContent ||
-                  (typeof msg.content === "string" ? msg.content : ""),
-              };
-
-              return <ChatMessageAgent key={index} message={displayMessage} />;
-            })
-          )}
-
-          {/* Streaming message */}
-          {streamingMessage && (
-            <div className="flex justify-center">
-              <div className="bg-gray-100 rounded-2xl py-4 w-2/3 animate-pulse">
-                <div className="max-w-3xl mx-auto flex gap-4 px-4">
-                  <Avatar
-                    icon={<RobotOutlined />}
-                    className="bg-blue-500 text-white"
-                    size={32}
-                  />
-                  <div className="flex-1 text-gray-800 text-sm leading-relaxed">
-                    <div className="w-full">
-                      <ReactMarkdown
-                        components={{
-                          img: ({ node, src, alt, ...props }) => (
-                            <img
-                              src={src}
-                              alt={alt || "Image"}
-                              className="my-2 max-w-full rounded-md"
-                              {...props}
-                            />
-                          ),
-                        }}
-                      >
-                        {streamingMessage}
-                      </ReactMarkdown>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          )}
-
-          {/* Source documents */}
-          {selectedDocuments.length > 0 && (
-            <div className="mt-4">
-              <Collapse
-                className="bg-white/80 border border-purple-100 rounded-xl overflow-hidden"
-                expandIconPosition="end"
-              >
-                <Panel
-                  header={
-                    <div className="flex items-center gap-2">
-                      <InfoCircleOutlined className="text-purple-600" />
-                      <span className="font-medium">
-                        Sources ({selectedDocuments.length})
-                      </span>
-                    </div>
-                  }
-                  key="1"
-                >
-                  <div className="space-y-3 max-h-60 overflow-y-auto">
-                    {selectedDocuments.map((doc, index) => (
-                      <div
-                        key={index}
-                        className="p-3 bg-gray-50 rounded-lg border border-gray-100"
-                      >
-                        <div className="flex items-center gap-2 mb-1">
-                          <Tag color="purple">{doc.id.substring(0, 8)}...</Tag>
-                          {doc.metadata && doc.metadata.type && (
-                            <Tag color="blue">{doc.metadata.type}</Tag>
-                          )}
-                        </div>
-                        <p className="text-sm text-gray-700">
-                          {doc.page_content}
-                        </p>
-                        {doc.metadata &&
-                          doc.metadata.public_url &&
-                          doc.metadata.type === "image" && (
-                            <div className="mt-2">
-                              <Image
-                                src={doc.metadata.public_url}
-                                alt="Source image"
-                                style={{
-                                  maxHeight: "150px",
-                                  borderRadius: "8px",
-                                }}
-                              />
-                            </div>
-                          )}
-                      </div>
-                    ))}
-                  </div>
-                </Panel>
-              </Collapse>
-            </div>
-          )}
-          <div ref={messagesEndRef} />
-        </div>
-      </div>
-
-      {/* Input Area */}
-      <div className="flex-none p-4 border-t border-purple-100 bg-white/80 backdrop-blur-sm">
-        <div className="max-w-3xl mx-auto">
-          <div className="flex justify-between items-center mb-2">
-            <div className="flex items-center gap-2">
-              <Switch
-                checked={isStreaming}
-                onChange={() => setIsStreaming(!isStreaming)}
-                size="small"
-              />
-              <span className="text-xs text-gray-600 flex items-center gap-1">
-                <ThunderboltOutlined />
-                Streaming {isStreaming ? "On" : "Off"}
-              </span>
-
-              <FileUploadButton
-                botId={botId}
-                onUploadSuccess={(result) => {
-                  // Refresh the chat or show a notification
-                  message.success(
-                    `Successfully processed ${result.file_path} with ${result.chunks_count} chunks`
-                  );
-                }}
-              />
-            </div>
-            {availableImages.length > 0 && (
-              <Button
-                type="default"
-                size="small"
-                icon={<PictureOutlined />}
-                onClick={openImageModal}
-              >
-                Select Image from Sources
-              </Button>
-            )}
-          </div>
-
-          {/* Selected Image Preview */}
-          {selectedImage && (
-            <div className="mb-3 relative">
-              <div className="rounded-lg overflow-hidden border border-purple-200">
-                <Image
-                  src={selectedImage}
-                  alt="Selected image"
-                  style={{
-                    maxHeight: "150px",
-                    width: "auto",
-                    margin: "0 auto",
-                  }}
-                  preview={false}
-                />
-              </div>
-              <Button
-                type="text"
-                danger
-                icon={<CloseCircleOutlined />}
-                size="small"
-                className="absolute top-1 right-1 bg-white/80 rounded-full"
-                onClick={clearSelectedImage}
-              />
-            </div>
-          )}
-
-          <div className="flex items-end gap-2">
-            <div className="flex-1">
-              <TextArea
-                ref={inputRef}
-                placeholder={
-                  selectedImage
-                    ? "Ask about this image..."
-                    : "Ask me about travel destinations..."
-                }
-                value={input}
-                onChange={(e) => setInput(e.target.value)}
-                onKeyDown={handleKeyPress}
-                autoSize={{ minRows: 1, maxRows: 4 }}
-                disabled={loading}
-                className="rounded-xl border-gray-300 focus:border-purple-400 focus:ring focus:ring-purple-200 focus:ring-opacity-50 resize-none"
-              />
-            </div>
-            <button
-              onClick={handleSend}
-              disabled={loading || (!input.trim() && !selectedImage)}
-              className={`p-2 rounded-full ${
-                loading || (!input.trim() && !selectedImage)
-                  ? "bg-gray-200 text-gray-400 cursor-not-allowed"
-                  : "bg-gradient-to-r from-purple-600 to-indigo-600 text-white shadow-md hover:shadow-lg transition-shadow duration-200"
-              }`}
-            >
-              <SendOutlined className="text-lg" />
-            </button>
-          </div>
-        </div>
-      </div>
+      {/* Edit Chatbot Modal */}
+      <ChatbotEditModal
+        isVisible={isEditModalVisible}
+        onClose={closeEditModal}
+        chatbot={chatbotDetails}
+        onSuccess={handleChatbotUpdate}
+      />
     </div>
   );
 };

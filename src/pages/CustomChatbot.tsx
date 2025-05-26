@@ -183,25 +183,26 @@ const CustomChatbot: React.FC = () => {
   };
 
   return (
-    <div className="flex flex-col h-screen bg-gradient-to-br from-purple-50 to-indigo-50">
-      <div className="flex-none bg-white/80 backdrop-blur-sm shadow-sm border-b border-purple-100 py-4">
-        <div className="max-w-3xl mx-auto flex justify-between items-center px-4">
+    <div className="flex flex-col h-screen bg-gradient-to-br from-blue-50 via-white to-indigo-50">
+      {/* Header */}
+      <div className="flex-none bg-white/90 backdrop-blur-sm shadow-sm border-b border-gray-100 py-4">
+        <div className="max-w-4xl mx-auto flex justify-between items-center px-4">
           <div className="flex items-center gap-3">
             <Button
               type="text"
               icon={<LeftOutlined />}
               onClick={() => navigate("/")}
-              className="mr-1"
+              className="text-gray-600 hover:text-blue-600"
             >
               Back
             </Button>
             <Avatar
               icon={<RobotOutlined />}
-              className="bg-gradient-to-r from-purple-600 to-indigo-600 text-white"
+              className="bg-gradient-to-r from-blue-500 to-indigo-500 text-white"
               size={40}
             />
             <div>
-              <h1 className="text-xl font-bold text-gray-800">
+              <h1 className="text-xl font-semibold text-gray-800">
                 Custom AI Assistant
               </h1>
               <p className="text-sm text-gray-500">
@@ -222,6 +223,7 @@ const CustomChatbot: React.FC = () => {
               danger
               icon={<DeleteOutlined />}
               onClick={clearHistory}
+              className="bg-red-500 hover:bg-red-600 border-none"
             >
               Clear
             </Button>
@@ -229,18 +231,18 @@ const CustomChatbot: React.FC = () => {
         </div>
       </div>
 
+      {/* Chat Messages */}
       <div className="flex-1 overflow-y-auto py-4 px-4">
-        <div className="max-w-3xl mx-auto space-y-6">
+        <div className="max-w-4xl mx-auto space-y-6">
           {messages.length === 0 ? (
             <div className="text-center py-10">
-              <div className="bg-white rounded-xl p-6 shadow-sm border border-purple-100">
-                <RobotOutlined className="text-4xl text-purple-500 mb-2" />
-                <h3 className="text-lg font-medium text-gray-800 mb-1">
+              <div className="bg-white rounded-xl p-8 shadow-sm border border-gray-100">
+                <RobotOutlined className="text-4xl text-blue-500 mb-4" />
+                <h3 className="text-lg font-medium text-gray-800 mb-2">
                   Custom AI Assistant
                 </h3>
-                <p className="text-gray-600 mb-4">
-                  Start a conversation with your custom AI assistant. Ask any
-                  questions or discuss any topic.
+                <p className="text-gray-600 mb-6">
+                  Start a conversation with your custom AI assistant. Ask any questions or discuss any topic.
                 </p>
               </div>
             </div>
@@ -254,10 +256,11 @@ const CustomChatbot: React.FC = () => {
             })
           )}
 
+          {/* Streaming Message */}
           {streamingMessage && (
             <div className="flex justify-center">
-              <div className="bg-gray-100 rounded-2xl py-4 w-2/3 animate-pulse">
-                <div className="max-w-3xl mx-auto flex gap-4 px-4">
+              <div className="bg-gray-50 rounded-2xl py-4 w-2/3 animate-pulse">
+                <div className="max-w-4xl mx-auto flex gap-4 px-4">
                   <Avatar
                     icon={<RobotOutlined />}
                     className="bg-blue-500 text-white"
@@ -277,8 +280,8 @@ const CustomChatbot: React.FC = () => {
       </div>
 
       {/* Input Area */}
-      <div className="flex-none p-4 border-t border-purple-100 bg-white/80 backdrop-blur-sm">
-        <div className="max-w-3xl mx-auto">
+      <div className="flex-none p-4 border-t border-gray-100 bg-white/90 backdrop-blur-sm">
+        <div className="max-w-4xl mx-auto">
           <div className="flex items-end gap-2">
             <div className="flex-1">
               <TextArea
@@ -289,16 +292,16 @@ const CustomChatbot: React.FC = () => {
                 onKeyDown={handleKeyPress}
                 autoSize={{ minRows: 1, maxRows: 4 }}
                 disabled={loading}
-                className="rounded-xl border-gray-300 focus:border-purple-400 focus:ring focus:ring-purple-200 focus:ring-opacity-50 resize-none"
+                className="rounded-xl border-gray-200 focus:border-blue-400 focus:ring focus:ring-blue-200 focus:ring-opacity-50 resize-none"
               />
             </div>
             <button
               onClick={handleSend}
               disabled={loading || !input.trim()}
-              className={`p-2 rounded-full ${
+              className={`p-3 rounded-full transition-all duration-200 ${
                 loading || !input.trim()
-                  ? "bg-gray-200 text-gray-400 cursor-not-allowed"
-                  : "bg-gradient-to-r from-purple-600 to-indigo-600 text-white shadow-md hover:shadow-lg transition-shadow duration-200"
+                  ? "bg-gray-100 text-gray-400 cursor-not-allowed"
+                  : "bg-blue-600 text-white shadow-sm hover:bg-blue-700 hover:shadow-md"
               }`}
             >
               <SendOutlined className="text-lg" />

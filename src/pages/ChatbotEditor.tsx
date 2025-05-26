@@ -121,14 +121,15 @@ const ChatbotEditor: React.FC = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-indigo-50 via-white to-purple-50 p-4 sm:p-6 md:p-8">
-      <div className="max-w-4xl mx-auto">
-        <div className="mb-6">
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-indigo-50">
+      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+        {/* Header */}
+        <div className="mb-8">
           <Button
             type="text"
             icon={<ArrowLeftOutlined />}
             onClick={handleBack}
-            className="mb-4"
+            className="text-gray-600 hover:text-blue-600 mb-4"
           >
             Back to Chatbot List
           </Button>
