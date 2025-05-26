@@ -1,12 +1,12 @@
-import React from 'react';
-import { Button, Avatar } from 'antd';
+import React from "react";
+import { Button } from "antd";
 import {
   MessageOutlined,
   DeleteOutlined,
   PlusOutlined,
   MenuFoldOutlined,
   MenuUnfoldOutlined,
-} from '@ant-design/icons';
+} from "@ant-design/icons";
 
 interface ConversationMeta {
   conversation_id: string;
@@ -44,7 +44,9 @@ const ConversationList: React.FC<ConversationListProps> = ({
         )}
         <Button
           type="text"
-          icon={isSidebarCollapsed ? <MenuUnfoldOutlined /> : <MenuFoldOutlined />}
+          icon={
+            isSidebarCollapsed ? <MenuUnfoldOutlined /> : <MenuFoldOutlined />
+          }
           onClick={onToggleSidebar}
           className="text-gray-600 hover:text-blue-600"
         />
@@ -102,4 +104,4 @@ const ConversationList: React.FC<ConversationListProps> = ({
   );
 };
 
-export default ConversationList; 
+export default ConversationList;
