@@ -55,8 +55,10 @@ const DocumentManagement: React.FC = () => {
       const newDocument = {
         documents: [
           {
+            id: crypto.randomUUID(),
             page_content: values.content,
             metadata,
+            type: values.type || "text"
           },
         ],
         ids: [crypto.randomUUID()],
