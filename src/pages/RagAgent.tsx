@@ -1,12 +1,14 @@
 import React, { useState, useRef, useEffect } from "react";
 import { useSearchParams, useNavigate } from "react-router-dom";
-import { Avatar, Button, message, Select } from "antd";
+import { Avatar, Button, message, Select, Dropdown, Spin } from "antd";
 import {
   DeleteOutlined,
   RobotOutlined,
   EditOutlined,
   LeftOutlined,
   ApiOutlined,
+  FileTextOutlined,
+  MoreOutlined,
 } from "@ant-design/icons";
 import { useTranslation } from "react-i18next";
 
@@ -23,6 +25,7 @@ import ConversationList from "../components/ConversationList";
 import ChatInput from "../components/ChatInput";
 import ChatMessages from "../components/ChatMessages";
 import ImageSelectionModal from "../components/ImageSelectionModal";
+import DocumentManagementModal from "../components/DocumentManagementModal";
 
 const CHAT_HISTORY_KEY = "rag_agent_chat_history";
 const CONVERSATION_LIST_KEY = "rag_agent_conversation_list";
@@ -80,6 +83,7 @@ const RagAgent: React.FC = () => {
   );
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
   const [isApiDocsVisible, setIsApiDocsVisible] = useState(false);
+  const [isDocumentManagementVisible, setIsDocumentManagementVisible] = useState(false);
 
   useEffect(() => {
     const botIdFromUrl = searchParams.get("botId");
@@ -459,6 +463,34 @@ const RagAgent: React.FC = () => {
     setChatbotDetails(updatedChatbot);
   };
 
+  const headerDropdownItems = [
+    {
+      key: 'document',
+      icon: <FileTextOutlined />,
+      label: t("document.manage"),
+      onClick: () => setIsDocumentManagementVisible(true),
+    },
+    {
+      key: 'edit',
+      icon: <EditOutlined />,
+      label: t("common.edit"),
+      onClick: openEditModal,
+    },
+    {
+      key: 'api',
+      icon: <ApiOutlined />,
+      label: t("chatbotEditor.apiDocs"),
+      onClick: () => setIsApiDocsVisible(true),
+    },
+    {
+      key: 'clear',
+      icon: <DeleteOutlined />,
+      label: t("chat.clearHistory"),
+      onClick: clearHistory,
+      danger: true,
+    },
+  ];
+
   return (
     <div className="flex h-screen bg-gradient-to-br from-blue-50 via-white to-indigo-50">
       {/* Conversation Sidebar */}
@@ -498,40 +530,37 @@ const RagAgent: React.FC = () => {
                 size={40}
               />
               <div>
-                <h1 className="text-xl font-semibold text-gray-800">
-                  {chatbotDetails?.name || t("chatbotEditor.defaultName")}
-                </h1>
-                <p className="text-sm text-gray-500">
-                  {chatbotDetails?.description}
-                </p>
+                {loadingChatbot ? (
+                  <div className="flex items-center gap-2">
+                    <Spin size="small" />
+                    <span className="text-gray-500">{t("common.loading")}</span>
+                  </div>
+                ) : (
+                  <>
+                    <h1 className="text-xl font-semibold text-gray-800">
+                      {chatbotDetails?.name || t("chatbotEditor.defaultName")}
+                    </h1>
+                    <p className="text-sm text-gray-500">
+                      {chatbotDetails?.description}
+                    </p>
+                  </>
+                )}
               </div>
             </div>
             <div className="flex items-center gap-2">
-              <Button
-                type="primary"
-                icon={<EditOutlined />}
-                onClick={openEditModal}
-                className="bg-blue-600 hover:bg-blue-700 border-none"
+              <Dropdown
+                menu={{ items: headerDropdownItems }}
+                placement="bottomRight"
+                trigger={['hover']}
               >
-                {t("common.edit")}
-              </Button>
-              <Button
-                type="primary"
-                icon={<ApiOutlined />}
-                onClick={() => setIsApiDocsVisible(true)}
-                className="bg-green-600 hover:bg-green-700 border-none"
-              >
-                {t("chatbotEditor.apiDocs")}
-              </Button>
-              <Button
-                type="primary"
-                danger
-                icon={<DeleteOutlined />}
-                onClick={clearHistory}
-                className="bg-red-500 hover:bg-red-600 border-none"
-              >
-                {t("chat.clearHistory")}
-              </Button>
+                <Button
+                  type="primary"
+                  icon={<MoreOutlined />}
+                  className="bg-purple-600 hover:bg-purple-700 border-none"
+                >
+                  {t("common.actions")}
+                </Button>
+              </Dropdown>
               <Select
                 value={modelName}
                 onChange={setModelName}
@@ -597,6 +626,12 @@ const RagAgent: React.FC = () => {
       <ApiDocs
         isVisible={isApiDocsVisible}
         onClose={() => setIsApiDocsVisible(false)}
+        botId={botId}
+      />
+
+      <DocumentManagementModal
+        isVisible={isDocumentManagementVisible}
+        onClose={() => setIsDocumentManagementVisible(false)}
         botId={botId}
       />
     </div>

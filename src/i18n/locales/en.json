@@ -13,7 +13,8 @@
     "confirm": "Confirm",
     "back": "Back",
     "next": "Next",
-    "finish": "Finish"
+    "finish": "Finish",
+    "actions": "Actions"
   },
   "chat": {
     "inputPlaceholder": "Ask me about travel destinations...",
@@ -40,8 +41,7 @@
     "stop": "Stop",
     "copy": "Copy",
     "copied": "Copied!",
-    "fileUploadSuccess": "Successfully processed {{file_path}} with {{chunks_count}} chunks",
-    "newConversation": "New conversation"
+    "fileUploadSuccess": "Successfully processed {{file_path}} with {{chunks_count}} chunks"
   },
   "landing": {
     "title": "Smart AI Assistant",
@@ -86,14 +86,18 @@
     "description": "Create and manage your AI assistants to help with travel planning, destination information, and more.",
     "createNew": "Create New Assistant",
     "search": "Search assistants...",
-    "noChatbots": "No AI assistants found",
-    "createFirst": "Create your first AI assistant to start having intelligent conversations about travel destinations.",
+    "noChatbots": "No AI Assistants Found",
+    "createFirst": "Create your first AI assistant to start having intelligent conversations about your travel destinations.",
     "deleteTitle": "Delete Assistant",
     "deleteConfirm": "Are you sure you want to delete this assistant? This action cannot be undone.",
     "deleteSuccess": "Successfully deleted assistant",
     "deleteError": "Could not delete assistant",
     "loadError": "Could not load assistant list",
-    "noDescription": "No description"
+    "noDescription": "No description",
+    "features": {
+      "aiPowered": "AI Powered",
+      "chatEnabled": "Chat Enabled"
+    }
   },
   "chatbotEditor": {
     "title": "Edit Assistant",
@@ -121,22 +125,25 @@
     "apiDocs": "API Documentation"
   },
   "customChatbot": {
-    "title": "Create Custom Assistant",
-    "step1": "Choose Assistant Type",
-    "step2": "Configure Assistant",
-    "step3": "Preview and Create",
-    "name": "Chatbot name",
-    "description": "Description",
-    "model": "Model",
-    "prompt": "Prompt",
-    "preview": "Preview",
-    "create": "Create chatbot",
-    "cancel": "Cancel",
-    "back": "Back",
-    "next": "Next",
-    "finish": "Finish",
-    "createSuccess": "Successfully created assistant",
-    "createError": "Could not create assistant"
+    "title": "Custom AI Assistant",
+    "description": "Chat with your custom AI assistant",
+    "welcome": {
+      "title": "Custom AI Assistant",
+      "description": "Start a conversation with your custom AI assistant. Ask any questions or discuss any topic."
+    },
+    "inputPlaceholder": "Type your message...",
+    "clear": "Clear",
+    "clearConfirm": "Are you sure you want to clear the conversation?",
+    "error": "Error: {{message}}",
+    "unknownError": "Unknown error",
+    "model": {
+      "title": "Select Model",
+      "gemini25": "Gemini 2.5 Flash",
+      "gemini20": "Gemini 2.0 Flash"
+    },
+    "thinking": "Thinking...",
+    "send": "Send",
+    "typeMessage": "Type a message..."
   },
   "errors": {
     "required": "This field is required",
@@ -149,5 +156,42 @@
     "networkError": "Network error",
     "serverError": "Server error",
     "unknownError": "Unknown error"
+  },
+  "document": {
+    "title": "Document Management",
+    "add": "Add Document",
+    "edit": "Edit Document",
+    "delete": "Delete",
+    "deleteSelected": "Delete Selected",
+    "type": "Type",
+    "content": "Content",
+    "contentRequired": "Please enter content",
+    "metadata": "Metadata",
+    "metadataPlaceholder": "Enter metadata in JSON format",
+    "actions": "Actions",
+    "deleteConfirm": "Are you sure you want to delete this document?",
+    "deleteSelectedConfirm": "Are you sure you want to delete selected documents?",
+    "total": "Total: {{total}} documents",
+    "success": "Operation completed successfully",
+    "error": "An error occurred",
+    "source": "Source",
+    "author": "Author",
+    "createdAt": "Created At",
+    "botId": "Bot ID",
+    "publicUrl": "Public URL",
+    "customMetadata": "Custom Metadata",
+    "customMetadataPlaceholder": "Enter additional metadata as key-value pairs (one per line, format: key=value)",
+    "manage": "Manage Documents",
+    "loadError": "Could not load documents",
+    "createError": "Could not create document",
+    "updateError": "Could not update document",
+    "deleteError": "Could not delete document"
+  },
+  "navigation": {
+    "assistants": "Assistants",
+    "documents": "Documents",
+    "settings": "Settings",
+    "profile": "Profile",
+    "logout": "Logout"
   }
 } 

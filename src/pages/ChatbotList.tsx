@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Card, Button, Input, Skeleton, message, Modal } from "antd";
+import { Card, Button, Input, Skeleton, message, Modal, BackTop } from "antd";
 import {
   PlusOutlined,
   SearchOutlined,
@@ -8,13 +8,16 @@ import {
   MessageOutlined,
   LeftOutlined,
   DeleteOutlined,
+  ArrowUpOutlined,
 } from "@ant-design/icons";
 import { useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import { fetchChatbots, deleteChatbot, Chatbot } from "../services/chatbotService";
 
 const { Search } = Input;
 
 const ChatbotList: React.FC = () => {
+  const { t } = useTranslation();
   const [chatbots, setChatbots] = useState<Chatbot[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [searchQuery, setSearchQuery] = useState("");
@@ -29,7 +32,7 @@ const ChatbotList: React.FC = () => {
         const data = await fetchChatbots();
         setChatbots(data);
       } catch (error) {
-        message.error("Failed to load chatbots");
+        message.error(t("chatbotList.loadError"));
         console.error("Error loading chatbots:", error);
       } finally {
         setLoading(false);
@@ -37,7 +40,7 @@ const ChatbotList: React.FC = () => {
     };
 
     loadChatbots();
-  }, []);
+  }, [t]);
 
   const filteredChatbots = chatbots.filter((bot) =>
     bot.name.toLowerCase().includes(searchQuery.toLowerCase())
@@ -66,10 +69,10 @@ const ChatbotList: React.FC = () => {
 
     try {
       await deleteChatbot(chatbotToDelete);
-      message.success("Chatbot deleted successfully");
+      message.success(t("chatbotList.deleteSuccess"));
       setChatbots(chatbots.filter(bot => bot.id !== chatbotToDelete));
     } catch (error) {
-      message.error("Failed to delete chatbot");
+      message.error(t("chatbotList.deleteError"));
       console.error("Error deleting chatbot:", error);
     } finally {
       setDeleteModalVisible(false);
@@ -107,11 +110,10 @@ const ChatbotList: React.FC = () => {
       <div className="text-center py-16 bg-white rounded-xl shadow-sm border border-gray-100">
         <RobotOutlined className="text-6xl text-blue-500 mb-4" />
         <h3 className="text-xl font-semibold text-gray-800 mb-2">
-          No AI Assistants Found
+          {t("chatbotList.noChatbots")}
         </h3>
         <p className="text-gray-600 mb-6 max-w-md mx-auto">
-          Create your first AI assistant to start having intelligent
-          conversations about your travel destinations.
+          {t("chatbotList.createFirst")}
         </p>
         <Button
           type="primary"
@@ -120,7 +122,7 @@ const ChatbotList: React.FC = () => {
           onClick={handleCreateChatbot}
           className="bg-blue-600 hover:bg-blue-700 border-none"
         >
-          Create New Assistant
+          {t("chatbotList.createNew")}
         </Button>
       </div>
     );
@@ -129,21 +131,32 @@ const ChatbotList: React.FC = () => {
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-indigo-50 py-8 px-4">
       <div className="max-w-7xl mx-auto">
+        {/* Back Button */}
+        <div className="mb-8">
+          <Button
+            type="text"
+            icon={<LeftOutlined />}
+            onClick={() => navigate("/")}
+            className="text-gray-600 hover:text-blue-600"
+          >
+            {t("common.back")}
+          </Button>
+        </div>
+
         {/* Header Section */}
         <div className="text-center mb-8">
           <h1 className="text-4xl font-bold text-gray-800 mb-4">
-            Your AI Assistants
+            {t("chatbotList.title")}
           </h1>
           <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-            Create and manage your AI assistants to help with travel planning,
-            destination information, and more.
+            {t("chatbotList.description")}
           </p>
         </div>
 
         {/* Search and Create Section */}
         <div className="flex flex-col md:flex-row justify-between items-center gap-4 mb-8">
           <Search
-            placeholder="Search assistants..."
+            placeholder={t("chatbotList.search")}
             allowClear
             enterButton={<SearchOutlined />}
             size="large"
@@ -157,7 +170,7 @@ const ChatbotList: React.FC = () => {
             onClick={handleCreateChatbot}
             className="bg-blue-600 hover:bg-blue-700 border-none whitespace-nowrap"
           >
-            Create New Assistant
+            {t("chatbotList.createNew")}
           </Button>
         </div>
 
@@ -193,16 +206,16 @@ const ChatbotList: React.FC = () => {
                       />
                     </div>
                     <p className="text-gray-600 text-sm mb-4 line-clamp-2">
-                      {bot.prompt}
+                      {bot.prompt || t("chatbotList.noDescription")}
                     </p>
                     <div className="flex items-center gap-4 text-sm text-gray-500">
                       <div className="flex items-center gap-1">
                         <ThunderboltOutlined />
-                        <span>AI Powered</span>
+                        <span>{t("chatbotList.features.aiPowered")}</span>
                       </div>
                       <div className="flex items-center gap-1">
                         <MessageOutlined />
-                        <span>Chat Enabled</span>
+                        <span>{t("chatbotList.features.chatEnabled")}</span>
                       </div>
                     </div>
                   </div>
@@ -213,30 +226,28 @@ const ChatbotList: React.FC = () => {
             <div className="col-span-full">{renderEmptyState()}</div>
           )}
         </div>
-
-        <Button
-          type="text"
-          icon={<LeftOutlined />}
-          onClick={() => navigate("/")}
-          className="text-gray-600 hover:text-blue-600"
-        >
-          Back
-        </Button>
       </div>
 
+      {/* Back to Top Button */}
+      <BackTop>
+        <div className="w-10 h-10 bg-white rounded-full shadow-lg flex items-center justify-center hover:bg-gray-50 transition-colors">
+          <ArrowUpOutlined className="text-gray-600" />
+        </div>
+      </BackTop>
+
       <Modal
-        title="Delete Chatbot"
+        title={t("chatbotList.deleteTitle")}
         open={deleteModalVisible}
         onOk={handleDeleteConfirm}
         onCancel={() => {
           setDeleteModalVisible(false);
           setChatbotToDelete(null);
         }}
-        okText="Delete"
+        okText={t("common.delete")}
         okButtonProps={{ danger: true }}
-        cancelText="Cancel"
+        cancelText={t("common.cancel")}
       >
-        <p>Are you sure you want to delete this chatbot? This action cannot be undone.</p>
+        <p>{t("chatbotList.deleteConfirm")}</p>
       </Modal>
     </div>
   );

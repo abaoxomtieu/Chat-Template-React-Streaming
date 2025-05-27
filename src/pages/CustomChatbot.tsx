@@ -1,12 +1,13 @@
 import React, { useState, useRef, useEffect } from "react";
 import { useSearchParams, useNavigate } from "react-router-dom";
-import { Avatar, Input, Button, Select } from "antd";
+import { Avatar, Input, Button, Select, Modal } from "antd";
 import {
   SendOutlined,
   DeleteOutlined,
   RobotOutlined,
   LeftOutlined,
 } from "@ant-design/icons";
+import { useTranslation } from "react-i18next";
 import ChatMessageAgent from "../components/ChatMessageAgent";
 import ReactMarkdown from "react-markdown";
 import { ApiDomain } from "../constants";
@@ -21,12 +22,8 @@ interface StructuredMessage {
   displayContent?: string;
 }
 
-const modelOptions = [
-  { label: "Gemini 2.5 Flash", value: "gemini-2.5-flash-preview-05-20" },
-  { label: "Gemini 2.0 Flash", value: "gemini-2.0-flash" },
-];
-
 const CustomChatbot: React.FC = () => {
+  const { t } = useTranslation();
   const [messages, setMessages] = useState<StructuredMessage[]>([]);
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
@@ -37,6 +34,12 @@ const CustomChatbot: React.FC = () => {
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<any>(null);
   const [modelName, setModelName] = useState<string>("gemini-2.5-flash-preview-05-20");
+  const [clearModalVisible, setClearModalVisible] = useState(false);
+
+  const modelOptions = [
+    { label: t("customChatbot.model.gemini25"), value: "gemini-2.5-flash-preview-05-20" },
+    { label: t("customChatbot.model.gemini20"), value: "gemini-2.0-flash" },
+  ];
 
   useEffect(() => {
     const existingId = searchParams.get("conversationId");
@@ -181,6 +184,11 @@ const CustomChatbot: React.FC = () => {
     setMessages([]);
   };
 
+  const handleClearConfirm = () => {
+    clearHistory();
+    setClearModalVisible(false);
+  };
+
   return (
     <div className="flex flex-col h-screen bg-gradient-to-br from-blue-50 via-white to-indigo-50">
       {/* Header */}
@@ -193,7 +201,7 @@ const CustomChatbot: React.FC = () => {
               onClick={() => navigate("/")}
               className="text-gray-600 hover:text-blue-600"
             >
-              Back
+              {t("common.back")}
             </Button>
             <Avatar
               icon={<RobotOutlined />}
@@ -202,10 +210,10 @@ const CustomChatbot: React.FC = () => {
             />
             <div>
               <h1 className="text-xl font-semibold text-gray-800">
-                Custom AI Assistant
+                {t("customChatbot.title")}
               </h1>
               <p className="text-sm text-gray-500">
-                Chat with your custom AI assistant
+                {t("customChatbot.description")}
               </p>
             </div>
           </div>
@@ -216,15 +224,16 @@ const CustomChatbot: React.FC = () => {
               style={{ width: 180 }}
               options={modelOptions}
               className="mr-2"
+              placeholder={t("customChatbot.model.title")}
             />
             <Button
               type="primary"
               danger
               icon={<DeleteOutlined />}
-              onClick={clearHistory}
+              onClick={() => setClearModalVisible(true)}
               className="bg-red-500 hover:bg-red-600 border-none"
             >
-              Clear
+              {t("customChatbot.clear")}
             </Button>
           </div>
         </div>
@@ -238,10 +247,10 @@ const CustomChatbot: React.FC = () => {
               <div className="bg-white rounded-xl p-8 shadow-sm border border-gray-100">
                 <RobotOutlined className="text-4xl text-blue-500 mb-4" />
                 <h3 className="text-lg font-medium text-gray-800 mb-2">
-                  Custom AI Assistant
+                  {t("customChatbot.welcome.title")}
                 </h3>
                 <p className="text-gray-600 mb-6">
-                  Start a conversation with your custom AI assistant. Ask any questions or discuss any topic.
+                  {t("customChatbot.welcome.description")}
                 </p>
               </div>
             </div>
@@ -285,7 +294,7 @@ const CustomChatbot: React.FC = () => {
             <div className="flex-1">
               <TextArea
                 ref={inputRef}
-                placeholder="Type your message..."
+                placeholder={t("customChatbot.inputPlaceholder")}
                 value={input}
                 onChange={(e) => setInput(e.target.value)}
                 onKeyDown={handleKeyPress}
@@ -302,12 +311,25 @@ const CustomChatbot: React.FC = () => {
                   ? "bg-gray-100 text-gray-400 cursor-not-allowed"
                   : "bg-blue-600 text-white shadow-sm hover:bg-blue-700 hover:shadow-md"
               }`}
+              title={t("customChatbot.send")}
             >
               <SendOutlined className="text-lg" />
             </button>
           </div>
         </div>
       </div>
+
+      {/* Clear Confirmation Modal */}
+      <Modal
+        title={t("customChatbot.clear")}
+        open={clearModalVisible}
+        onOk={handleClearConfirm}
+        onCancel={() => setClearModalVisible(false)}
+        okText={t("common.confirm")}
+        cancelText={t("common.cancel")}
+      >
+        <p>{t("customChatbot.clearConfirm")}</p>
+      </Modal>
     </div>
   );
 };

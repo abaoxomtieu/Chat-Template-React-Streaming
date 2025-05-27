@@ -4,6 +4,8 @@ import ChatbotList from "./pages/ChatbotList";
 import ChatbotEditor from "./pages/ChatbotEditor";
 import CustomChatbot from "./pages/CustomChatbot";
 import LandingPage from "./pages/LandingPage";
+import DocumentManagement from './pages/DocumentManagement';
+
 function App() {
   return (
     <Router>
@@ -13,6 +15,7 @@ function App() {
         <Route path="/rag-agent" element={<RagAgent />} />
         <Route path="/chatbot-editor/:botId" element={<ChatbotEditor />} />
         <Route path="/create-prompt" element={<CustomChatbot />} />
+        <Route path="/documents" element={<DocumentManagement />} />
       </Routes>
     </Router>
   );

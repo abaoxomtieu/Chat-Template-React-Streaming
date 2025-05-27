@@ -14,7 +14,8 @@
     "back": "Quay lại",
     "next": "Tiếp theo",
     "finish": "Hoàn thành",
-    "language": "Ngôn ngữ"
+    "language": "Ngôn ngữ",
+    "actions": "Thao tác"
   },
   "chat": {
     "inputPlaceholder": "Hỏi tôi về điểm du lịch...",
@@ -101,7 +102,11 @@
     "createdAt": "Ngày tạo",
     "lastModified": "Lần sửa đổi cuối",
     "status": "Trạng thái",
-    "actions": "Thao tác"
+    "actions": "Thao tác",
+    "features": {
+      "aiPowered": "Được hỗ trợ bởi AI",
+      "chatEnabled": "Hỗ trợ trò chuyện"
+    }
   },
   "chatbotEditor": {
     "title": "Chỉnh sửa trợ lý",
@@ -129,21 +134,25 @@
     "apiDocs": "Tài liệu API"
   },
   "customChatbot": {
-    "title": "Tạo trợ lý tùy chỉnh",
-    "step1": "Chọn loại trợ lý",
-    "step2": "Cấu hình trợ lý",
-    "step3": "Xem trước và tạo",
-    "name": "Tên Chatbot",
-    "description": "Mô tả",
-    "purpose": "Mục đích",
-    "targetAudience": "Đối tượng mục tiêu",
-    "model": "Mô hình AI",
-    "temperature": "Nhiệt độ",
-    "maxTokens": "Số token tối đa",
-    "uploadDocuments": "Tải lên tài liệu",
-    "addKnowledge": "Thêm kiến thức",
-    "createSuccess": "Đã tạo trợ lý thành công",
-    "createError": "Không thể tạo trợ lý"
+    "title": "Trợ lý AI tùy chỉnh",
+    "description": "Trò chuyện với trợ lý AI tùy chỉnh của bạn",
+    "welcome": {
+      "title": "Trợ lý AI tùy chỉnh",
+      "description": "Bắt đầu cuộc trò chuyện với trợ lý AI tùy chỉnh của bạn. Hỏi bất kỳ câu hỏi nào hoặc thảo luận về bất kỳ chủ đề nào."
+    },
+    "inputPlaceholder": "Nhập tin nhắn của bạn...",
+    "clear": "Xóa",
+    "clearConfirm": "Bạn có chắc chắn muốn xóa cuộc trò chuyện?",
+    "error": "Lỗi: {{message}}",
+    "unknownError": "Lỗi không xác định",
+    "model": {
+      "title": "Chọn mô hình",
+      "gemini25": "Gemini 2.5 Flash",
+      "gemini20": "Gemini 2.0 Flash"
+    },
+    "thinking": "Đang suy nghĩ...",
+    "send": "Gửi",
+    "typeMessage": "Nhập tin nhắn..."
   },
   "errors": {
     "required": "Trường này là bắt buộc",
@@ -151,5 +160,42 @@
     "serverError": "Lỗi máy chủ",
     "networkError": "Lỗi kết nối",
     "unknownError": "Lỗi không xác định"
+  },
+  "document": {
+    "title": "Quản lý tài liệu",
+    "add": "Thêm tài liệu",
+    "edit": "Chỉnh sửa tài liệu",
+    "delete": "Xóa",
+    "deleteSelected": "Xóa đã chọn",
+    "type": "Loại",
+    "content": "Nội dung",
+    "contentRequired": "Vui lòng nhập nội dung",
+    "metadata": "Metadata",
+    "metadataPlaceholder": "Nhập metadata theo định dạng JSON",
+    "actions": "Thao tác",
+    "deleteConfirm": "Bạn có chắc chắn muốn xóa tài liệu này?",
+    "deleteSelectedConfirm": "Bạn có chắc chắn muốn xóa các tài liệu đã chọn?",
+    "total": "Tổng số: {{total}} tài liệu",
+    "success": "Thao tác hoàn tất",
+    "error": "Đã xảy ra lỗi",
+    "source": "Nguồn",
+    "author": "Tác giả",
+    "createdAt": "Ngày tạo",
+    "botId": "ID Bot",
+    "publicUrl": "URL Công khai",
+    "customMetadata": "Metadata tùy chỉnh",
+    "customMetadataPlaceholder": "Nhập metadata bổ sung theo định dạng key-value (mỗi dòng một cặp, định dạng: key=value)",
+    "manage": "Quản lý tài liệu",
+    "loadError": "Không thể tải tài liệu",
+    "createError": "Không thể tạo tài liệu",
+    "updateError": "Không thể cập nhật tài liệu",
+    "deleteError": "Không thể xóa tài liệu"
+  },
+  "navigation": {
+    "assistants": "Trợ lý",
+    "documents": "Tài liệu",
+    "settings": "Cài đặt",
+    "profile": "Hồ sơ",
+    "logout": "Đăng xuất"
   }
-} 
+}
