@@ -73,8 +73,7 @@ const LandingPage: React.FC = () => {
                 {t("landing.features.customChatbot")}
               </h3>
               <p className="text-gray-600">
-                Create and customize your own AI chatbot with advanced
-                capabilities
+                {t("landing.features.customChatbotDesc")}
               </p>
             </div>
             <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-100">
@@ -82,8 +81,7 @@ const LandingPage: React.FC = () => {
                 {t("landing.features.ragProcessing")}
               </h3>
               <p className="text-gray-600">
-                Process and analyze documents with Retrieval-Augmented
-                Generation
+                {t("landing.features.ragProcessingDesc")}
               </p>
             </div>
             <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-100">
@@ -91,7 +89,7 @@ const LandingPage: React.FC = () => {
                 {t("landing.features.multipleModels")}
               </h3>
               <p className="text-gray-600">
-                Choose from multiple AI models to power your chatbot
+                {t("landing.features.multipleModelsDesc")}
               </p>
             </div>
           </div>
@@ -110,7 +108,7 @@ const LandingPage: React.FC = () => {
                 {t("landing.capabilities.documentProcessing")}
               </h3>
               <p className="text-gray-600">
-                Process and analyze various document formats
+                {t("landing.capabilities.documentProcessingDesc")}
               </p>
             </div>
             <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-100">
@@ -118,7 +116,7 @@ const LandingPage: React.FC = () => {
                 {t("landing.capabilities.streamingResponses")}
               </h3>
               <p className="text-gray-600">
-                Get real-time streaming responses from your chatbot
+                {t("landing.capabilities.streamingResponsesDesc")}
               </p>
             </div>
             <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-100">
@@ -126,7 +124,7 @@ const LandingPage: React.FC = () => {
                 {t("landing.capabilities.intelligentPrompting")}
               </h3>
               <p className="text-gray-600">
-                Generate intelligent prompts for better responses
+                {t("landing.capabilities.intelligentPromptingDesc")}
               </p>
             </div>
             <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-100">
@@ -134,7 +132,7 @@ const LandingPage: React.FC = () => {
                 {t("landing.capabilities.vectorStorage")}
               </h3>
               <p className="text-gray-600">
-                Store and retrieve information using vector databases
+                {t("landing.capabilities.vectorStorageDesc")}
               </p>
             </div>
           </div>

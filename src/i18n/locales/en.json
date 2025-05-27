@@ -50,28 +50,27 @@
     "startJourney": "Start Journey",
     "features": {
       "title": "Features",
-      "feature1": {
-        "title": "Artificial Intelligence",
-        "description": "Using advanced AI technology to provide intelligent conversation experience"
-      },
-      "feature2": {
-        "title": "Customization",
-        "description": "Customize your assistant with specialized features and knowledge"
-      },
-      "feature3": {
-        "title": "Easy Integration",
-        "description": "Easily integrate AI assistants into your application"
-      }
+      "customChatbot": "Custom AI Assistant",
+      "customChatbotDesc": "Create and customize your own AI chatbot with advanced capabilities",
+      "ragProcessing": "RAG Processing",
+      "ragProcessingDesc": "Process and analyze documents with Retrieval-Augmented Generation",
+      "multipleModels": "Multiple Models",
+      "multipleModelsDesc": "Choose from multiple AI models to power your chatbot"
     },
     "capabilities": {
       "title": "Capabilities",
-      "capability1": "Answer questions about travel destinations",
-      "capability2": "Suggest travel itineraries",
-      "capability3": "Provide information about local culture",
-      "capability4": "Support booking accommodations and tickets"
+      "documentProcessing": "Document Processing",
+      "documentProcessingDesc": "Process and analyze various document formats",
+      "streamingResponses": "Streaming Responses",
+      "streamingResponsesDesc": "Get real-time streaming responses from your chatbot",
+      "intelligentPrompting": "Intelligent Prompting",
+      "intelligentPromptingDesc": "Generate intelligent prompts for better responses",
+      "vectorStorage": "Vector Storage",
+      "vectorStorageDesc": "Store and retrieve information using vector databases"
     },
     "testimonials": {
       "title": "User Testimonials",
+      "subtitle": "See what our users are saying about their experience",
       "testimonial1": {
         "text": "This AI assistant helped me plan the perfect trip!",
         "author": "John Doe"

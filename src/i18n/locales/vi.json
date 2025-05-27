@@ -53,28 +53,27 @@
     "startJourney": "Bắt đầu hành trình",
     "features": {
       "title": "Tính năng",
-      "feature1": {
-        "title": "Trí tuệ nhân tạo",
-        "description": "Sử dụng công nghệ AI tiên tiến để cung cấp trải nghiệm trò chuyện thông minh"
-      },
-      "feature2": {
-        "title": "Tùy chỉnh",
-        "description": "Tùy chỉnh trợ lý của bạn với các tính năng và kiến thức chuyên biệt"
-      },
-      "feature3": {
-        "title": "Tích hợp dễ dàng",
-        "description": "Tích hợp trợ lý AI vào ứng dụng của bạn một cách dễ dàng"
-      }
+      "customChatbot": "Trợ lý AI tùy chỉnh",
+      "customChatbotDesc": "Tạo và tùy chỉnh trợ lý AI của riêng bạn với các khả năng tiên tiến",
+      "ragProcessing": "Xử lý RAG",
+      "ragProcessingDesc": "Xử lý và phân tích tài liệu với công nghệ Retrieval-Augmented Generation",
+      "multipleModels": "Nhiều mô hình",
+      "multipleModelsDesc": "Lựa chọn từ nhiều mô hình AI để cung cấp năng lực cho trợ lý của bạn"
     },
     "capabilities": {
       "title": "Khả năng",
-      "capability1": "Trả lời câu hỏi về điểm đến du lịch",
-      "capability2": "Đề xuất lịch trình du lịch",
-      "capability3": "Cung cấp thông tin về văn hóa địa phương",
-      "capability4": "Hỗ trợ đặt phòng và vé"
+      "documentProcessing": "Xử lý tài liệu",
+      "documentProcessingDesc": "Xử lý và phân tích nhiều định dạng tài liệu khác nhau",
+      "streamingResponses": "Phản hồi trực tuyến",
+      "streamingResponsesDesc": "Nhận phản hồi trực tuyến từ trợ lý của bạn",
+      "intelligentPrompting": "Tạo lời nhắc thông minh",
+      "intelligentPromptingDesc": "Tạo lời nhắc thông minh để có phản hồi tốt hơn",
+      "vectorStorage": "Lưu trữ vector",
+      "vectorStorageDesc": "Lưu trữ và truy xuất thông tin sử dụng cơ sở dữ liệu vector"
     },
     "testimonials": {
       "title": "Đánh giá từ người dùng",
+      "subtitle": "Xem người dùng nói gì về trải nghiệm của họ",
       "testimonial1": {
         "text": "Trợ lý AI này đã giúp tôi lên kế hoạch chuyến đi hoàn hảo!",
         "author": "Nguyễn Văn A"
