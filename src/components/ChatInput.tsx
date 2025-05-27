@@ -1,26 +1,23 @@
-import React from 'react';
-import { Input, Switch, Button, Image } from 'antd';
+import React from "react";
+import { Input, Button, Image } from "antd";
 import {
   SendOutlined,
-  ThunderboltOutlined,
   PictureOutlined,
   CloseCircleOutlined,
-} from '@ant-design/icons';
-import FileUploadButton from './FileUploadButton';
+} from "@ant-design/icons";
+import FileUploadButton from "./FileUploadButton";
 
 const { TextArea } = Input;
 
 interface ChatInputProps {
   input: string;
   loading: boolean;
-  isStreaming: boolean;
   selectedImage: string | null;
   availableImages: any[];
   botId: string;
   onInputChange: (value: string) => void;
   onSend: () => void;
   onKeyPress: (e: React.KeyboardEvent) => void;
-  onStreamingToggle: () => void;
   onImageClear: () => void;
   onImageModalOpen: () => void;
   onUploadSuccess: (result: any) => void;
@@ -29,14 +26,13 @@ interface ChatInputProps {
 const ChatInput: React.FC<ChatInputProps> = ({
   input,
   loading,
-  isStreaming,
   selectedImage,
   availableImages,
   botId,
   onInputChange,
   onSend,
   onKeyPress,
-  onStreamingToggle,
+
   onImageClear,
   onImageModalOpen,
   onUploadSuccess,
@@ -46,21 +42,7 @@ const ChatInput: React.FC<ChatInputProps> = ({
       <div className="max-w-4xl mx-auto">
         <div className="flex justify-between items-center mb-2">
           <div className="flex items-center gap-2">
-            <Switch
-              checked={isStreaming}
-              onChange={onStreamingToggle}
-              size="small"
-              className="bg-gray-200"
-            />
-            <span className="text-xs text-gray-600 flex items-center gap-1">
-              <ThunderboltOutlined />
-              Streaming {isStreaming ? "On" : "Off"}
-            </span>
-
-            <FileUploadButton
-              botId={botId}
-              onUploadSuccess={onUploadSuccess}
-            />
+            <FileUploadButton botId={botId} onUploadSuccess={onUploadSuccess} />
           </div>
           {availableImages.length > 0 && (
             <Button
@@ -130,4 +112,4 @@ const ChatInput: React.FC<ChatInputProps> = ({
   );
 };
 
-export default ChatInput; 
+export default ChatInput;

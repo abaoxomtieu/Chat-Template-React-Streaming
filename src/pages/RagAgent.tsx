@@ -14,7 +14,6 @@ import { useTranslation } from "react-i18next";
 
 import {
   RagAgentPayload,
-  sendRagAgentMessage,
   sendStreamingRagAgentMessage,
 } from "../services/ragAgentService";
 import { fetchChatbotDetail, Chatbot } from "../services/chatbotService";
@@ -62,7 +61,6 @@ const RagAgent: React.FC = () => {
   });
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
-  const [isStreaming, setIsStreaming] = useState(true);
   const [streamingMessage, setStreamingMessage] = useState("");
   const [selectedDocuments, setSelectedDocuments] = useState<any[]>([]);
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
@@ -83,7 +81,8 @@ const RagAgent: React.FC = () => {
   );
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
   const [isApiDocsVisible, setIsApiDocsVisible] = useState(false);
-  const [isDocumentManagementVisible, setIsDocumentManagementVisible] = useState(false);
+  const [isDocumentManagementVisible, setIsDocumentManagementVisible] =
+    useState(false);
 
   useEffect(() => {
     const botIdFromUrl = searchParams.get("botId");
@@ -300,81 +299,6 @@ const RagAgent: React.FC = () => {
     }
   };
 
-  const handleNonStreamingChat = async (payload: RagAgentPayload) => {
-    try {
-      const response = await sendRagAgentMessage({
-        ...payload,
-        model_name: modelName,
-      });
-
-      let responseContent = response.final_response;
-      let contentForApi = responseContent;
-
-      const imageDocuments = (response.selected_documents || []).filter(
-        (doc) =>
-          doc.metadata &&
-          doc.metadata.public_url &&
-          doc.metadata.type === "image"
-      );
-
-      const contentItems = [];
-
-      if (responseContent) {
-        contentItems.push({ type: "text", text: responseContent });
-      }
-
-      if (imageDocuments.length > 0) {
-        if (
-          responseContent.includes("[Image]") ||
-          responseContent.includes("[image]")
-        ) {
-          imageDocuments.forEach((doc) => {
-            responseContent = responseContent.replace(
-              /\[Image\]/i,
-              `![image]\n(${doc.metadata.public_url})`
-            );
-
-            contentItems.push({
-              type: "image",
-              source_type: "url",
-              url: doc.metadata.public_url,
-            });
-          });
-        }
-      }
-
-      const aiMessage: StructuredMessage = {
-        role: "assistant",
-        content: contentItems.length > 1 ? contentItems : contentForApi,
-        type: "ai",
-        displayContent: responseContent,
-      };
-
-      setMessages((prev) => [...prev, aiMessage] as StructuredMessage[]);
-      setSelectedDocuments(response.selected_documents || []);
-      setLoading(false);
-
-      setTimeout(() => {
-        inputRef.current?.focus();
-      }, 100);
-    } catch (error) {
-      console.error("Error in non-streaming chat:", error);
-      setLoading(false);
-
-      const errorMessage: StructuredMessage = {
-        role: "assistant",
-        content: `${t("chat.error")}: ${
-          error instanceof Error ? error.message : t("errors.unknownError")
-        }`,
-        type: "ai",
-        displayContent: `${t("chat.error")}: ${
-          error instanceof Error ? error.message : t("errors.unknownError")
-        }`,
-      };
-      setMessages((prev) => [...prev, errorMessage] as StructuredMessage[]);
-    }
-  };
-
   const openImageModal = () => {
     setIsImageModalVisible(true);
   };
@@ -430,11 +354,7 @@ const RagAgent: React.FC = () => {
       conversation_id: conversationId,
     };
 
-    if (isStreaming) {
-      await handleStreamingChat(payload);
-    } else {
-      await handleNonStreamingChat(payload);
-    }
+    await handleStreamingChat(payload);
 
     clearSelectedImage();
   };
@@ -465,25 +385,25 @@ const RagAgent: React.FC = () => {
 
   const headerDropdownItems = [
     {
-      key: 'document',
+      key: "document",
       icon: <FileTextOutlined />,
       label: t("document.manage"),
       onClick: () => setIsDocumentManagementVisible(true),
     },
     {
-      key: 'edit',
+      key: "edit",
       icon: <EditOutlined />,
       label: t("common.edit"),
       onClick: openEditModal,
     },
     {
-      key: 'api',
+      key: "api",
       icon: <ApiOutlined />,
       label: t("chatbotEditor.apiDocs"),
       onClick: () => setIsApiDocsVisible(true),
     },
     {
-      key: 'clear',
+      key: "clear",
       icon: <DeleteOutlined />,
       label: t("chat.clearHistory"),
       onClick: clearHistory,
@@ -551,7 +471,7 @@ const RagAgent: React.FC = () => {
               <Dropdown
                 menu={{ items: headerDropdownItems }}
                 placement="bottomRight"
-                trigger={['hover']}
+                trigger={["hover"]}
               >
                 <Button
                   type="primary"
@@ -587,14 +507,12 @@ const RagAgent: React.FC = () => {
         <ChatInput
           input={input}
           loading={loading}
-          isStreaming={isStreaming}
           selectedImage={selectedImage}
           availableImages={availableImages}
           botId={botId}
           onInputChange={setInput}
           onSend={handleSend}
           onKeyPress={handleKeyPress}
-          onStreamingToggle={() => setIsStreaming(!isStreaming)}
           onImageClear={clearSelectedImage}
           onImageModalOpen={openImageModal}
           onUploadSuccess={(result) => {
