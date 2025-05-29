@@ -19,6 +19,7 @@ import {
   Chatbot, 
   ChatbotUpdateRequest 
 } from "../services/chatbotService";
+import { useTranslation } from "react-i18next";
 
 const { TextArea } = Input;
 
@@ -35,6 +36,7 @@ const ChatbotEditModal: React.FC<ChatbotEditModalProps> = ({
   chatbot,
   onSuccess,
 }) => {
+  const { t } = useTranslation();
   const [form] = Form.useForm();
   const [saving, setSaving] = useState(false);
   const [selectedTools, setSelectedTools] = useState<string[]>([]);
@@ -68,13 +70,13 @@ const ChatbotEditModal: React.FC<ChatbotEditModalProps> = ({
 
       if (chatbot?.id) {
         const updatedChatbot = await updateChatbot(chatbot.id, updateData);
-        message.success("Chatbot updated successfully");
+        message.success(t("chatbotEditModal.updateSuccess"));
         onSuccess(updatedChatbot);
         onClose();
       }
     } catch (error) {
       console.error("Failed to update chatbot:", error);
-      message.error("Failed to update chatbot");
+      message.error(t("chatbotEditModal.updateError"));
     } finally {
       setSaving(false);
     }
@@ -82,12 +84,12 @@ const ChatbotEditModal: React.FC<ChatbotEditModalProps> = ({
 
   return (
     <Modal
-      title="Edit Chatbot"
+      title={t("chatbotEditModal.title")}
       open={isVisible}
       onCancel={onClose}
       footer={[
         <Button key="cancel" onClick={onClose}>
-          Cancel
+          {t("chatbotEditModal.cancel")}
         </Button>,
         <Button
           key="save"
@@ -96,7 +98,7 @@ const ChatbotEditModal: React.FC<ChatbotEditModalProps> = ({
           onClick={handleSave}
           className="bg-gradient-to-r from-purple-600 to-indigo-600"
         >
-          Save Changes
+          {t("chatbotEditModal.saveChanges")}
         </Button>,
       ]}
       width={700}
@@ -111,20 +113,20 @@ const ChatbotEditModal: React.FC<ChatbotEditModalProps> = ({
       >
         <Form.Item
           name="name"
-          label="Chatbot Name"
-          rules={[{ required: true, message: "Please enter a name" }]}
+          label={t("chatbotEditModal.nameLabel")}
+          rules={[{ required: true, message: t("chatbotEditModal.nameRequired") }]}
         >
-          <Input placeholder="Enter chatbot name" />
+          <Input placeholder={t("chatbotEditModal.namePlaceholder")} />
         </Form.Item>
 
         <Form.Item
           name="prompt"
-          label="System Prompt"
-          rules={[{ required: true, message: "Please enter a prompt" }]}
-          help="This is the system prompt that defines your chatbot's personality and capabilities."
+          label={t("chatbotEditModal.promptLabel")}
+          rules={[{ required: true, message: t("chatbotEditModal.promptRequired") }]}
+          help={t("chatbotEditModal.promptHelp")}
         >
           <TextArea
-            placeholder="Enter system prompt"
+            placeholder={t("chatbotEditModal.promptPlaceholder")}
             autoSize={{ minRows: 6, maxRows: 12 }}
             className="font-mono text-sm"
           />
@@ -133,14 +135,14 @@ const ChatbotEditModal: React.FC<ChatbotEditModalProps> = ({
         <Divider>
           <Space>
             <ToolOutlined />
-            <span>Available Tools</span>
+            <span>{t("chatbotEditModal.toolsTitle")}</span>
           </Space>
         </Divider>
 
         <div className="mb-6">
           <div className="flex items-center mb-2">
-            <span className="font-medium mr-2">Tools</span>
-            <Tooltip title="Select tools that your chatbot can use to enhance its capabilities">
+            <span className="font-medium mr-2">{t("chatbotEditModal.toolsTitle")}</span>
+            <Tooltip title={t("chatbotEditModal.toolsHelp")}>
               <QuestionCircleOutlined className="text-gray-400" />
             </Tooltip>
           </div>
@@ -157,28 +159,46 @@ const ChatbotEditModal: React.FC<ChatbotEditModalProps> = ({
                   }
                 }}
               >
-                <span className="font-medium">Document Retrieval</span>
+                <span className="font-medium">{t("chatbotEditModal.documentRetrieval")}</span>
               </Checkbox>
               <div className="ml-6 text-sm text-gray-500">
-                Allows the chatbot to search and retrieve information from your document database
+                {t("chatbotEditModal.documentRetrievalHelp")}
               </div>
             </div>
             
             <div className="flex items-center">
               <Checkbox
-                checked={selectedTools.includes("search_engine")}
+                checked={selectedTools.includes("duckduckgo_search")}
                 onChange={(e) => {
                   if (e.target.checked) {
-                    setSelectedTools([...selectedTools, "search_engine"]);
+                    setSelectedTools([...selectedTools, "duckduckgo_search"]);
                   } else {
-                    setSelectedTools(selectedTools.filter(t => t !== "search_engine"));
+                    setSelectedTools(selectedTools.filter(t => t !== "duckduckgo_search"));
                   }
                 }}
               >
-                <span className="font-medium">Web Search</span>
+                <span className="font-medium">{t("chatbotEditModal.duckDuckSearch")}</span>
               </Checkbox>
               <div className="ml-6 text-sm text-gray-500">
-                Allows the chatbot to search the web for current information
+                {t("chatbotEditModal.duckDuckSearchHelp")}
+              </div>
+            </div>
+
+            <div className="flex items-center">
+              <Checkbox
+                checked={selectedTools.includes("python_repl")}
+                onChange={(e) => {
+                  if (e.target.checked) {
+                    setSelectedTools([...selectedTools, "python_repl"]);
+                  } else {
+                    setSelectedTools(selectedTools.filter(t => t !== "python_repl"));
+                  }
+                }}
+              >
+                <span className="font-medium">{t("chatbotEditModal.pythonRepl")}</span>
+              </Checkbox>
+              <div className="ml-6 text-sm text-gray-500">
+                {t("chatbotEditModal.pythonReplHelp")}
               </div>
             </div>
           </div>

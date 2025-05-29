@@ -193,5 +193,27 @@
     "settings": "Settings",
     "profile": "Profile",
     "logout": "Logout"
+  },
+  "chatbotEditModal": {
+    "title": "Edit Chatbot",
+    "nameLabel": "Chatbot Name",
+    "namePlaceholder": "Enter chatbot name",
+    "nameRequired": "Please enter a name",
+    "promptLabel": "System Prompt",
+    "promptPlaceholder": "Enter system prompt",
+    "promptRequired": "Please enter a prompt",
+    "promptHelp": "This is the system prompt that defines your chatbot's personality and capabilities.",
+    "toolsTitle": "Available Tools",
+    "toolsHelp": "Select tools that your chatbot can use to enhance its capabilities",
+    "documentRetrieval": "Document Retrieval",
+    "documentRetrievalHelp": "Allows the chatbot to search and retrieve information from your document database",
+    "duckDuckSearch": "Duck Duck Search",
+    "duckDuckSearchHelp": "Allows the chatbot to search the web for current information using DuckDuckGo",
+    "pythonRepl": "Python REPL",
+    "pythonReplHelp": "Allows the chatbot to execute Python code for complex calculations and data processing",
+    "cancel": "Cancel",
+    "saveChanges": "Save Changes",
+    "updateSuccess": "Chatbot updated successfully",
+    "updateError": "Failed to update chatbot"
   }
 } 

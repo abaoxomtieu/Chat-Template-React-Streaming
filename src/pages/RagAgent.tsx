@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from "react";
 import { useSearchParams, useNavigate } from "react-router-dom";
-import { Avatar, Button, message, Select, Dropdown, Spin } from "antd";
+import { Avatar, Button, message, Select, Dropdown, Spin, Switch, Tooltip } from "antd";
 import {
   DeleteOutlined,
   RobotOutlined,
@@ -9,6 +9,7 @@ import {
   ApiOutlined,
   FileTextOutlined,
   MoreOutlined,
+  SoundOutlined,
 } from "@ant-design/icons";
 import { useTranslation } from "react-i18next";
 
@@ -25,6 +26,7 @@ import ChatInput from "../components/ChatInput";
 import ChatMessages from "../components/ChatMessages";
 import ImageSelectionModal from "../components/ImageSelectionModal";
 import DocumentManagementModal from "../components/DocumentManagementModal";
+import { ttsService } from "../services/ttsService";
 
 const CHAT_HISTORY_KEY = "rag_agent_chat_history";
 const CONVERSATION_LIST_KEY = "rag_agent_conversation_list";
@@ -38,6 +40,11 @@ interface ConversationMeta {
 const modelOptions = [
   { label: "Gemini 2.5 Flash", value: "gemini-2.5-flash-preview-05-20" },
   { label: "Gemini 2.0 Flash", value: "gemini-2.0-flash" },
+];
+
+const ttsProviderOptions = [
+  { label: "HuggingFace", value: "huggingface" },
+  { label: "Gemini", value: "gemini" },
 ];
 
 const RagAgent: React.FC = () => {
@@ -83,6 +90,9 @@ const RagAgent: React.FC = () => {
   const [isApiDocsVisible, setIsApiDocsVisible] = useState(false);
   const [isDocumentManagementVisible, setIsDocumentManagementVisible] =
     useState(false);
+  const [isTTSEnabled, setIsTTSEnabled] = useState(false);
+  const [ttsProvider, setTtsProvider] = useState("huggingface");
+  const [currentAudio, setCurrentAudio] = useState<HTMLAudioElement | null>(null);
 
   useEffect(() => {
     const botIdFromUrl = searchParams.get("botId");
@@ -211,6 +221,22 @@ const RagAgent: React.FC = () => {
     setAvailableImages(images);
   }, [selectedDocuments]);
 
+  const playTTS = async (text: string) => {
+    if (!isTTSEnabled) return;
+    
+    try {
+      const audioUrl = await ttsService.textToSpeech(text, ttsProvider);
+      if (currentAudio) {
+        currentAudio.pause();
+      }
+      const audio = new Audio(audioUrl);
+      setCurrentAudio(audio);
+      audio.play();
+    } catch (error) {
+      console.error('Error playing TTS:', error);
+    }
+  };
+
   const handleStreamingChat = async (payload: RagAgentPayload) => {
     try {
       setStreamingMessage("");
@@ -274,6 +300,11 @@ const RagAgent: React.FC = () => {
             setMessages((prev) => [...prev, aiMessage] as StructuredMessage[]);
             setSelectedDocuments(finalData.selected_documents || []);
             setLoading(false);
+
+            // Play TTS for the response
+            if (isTTSEnabled && responseContent) {
+              playTTS(responseContent);
+            }
 
             setTimeout(() => {
               inputRef.current?.focus();
@@ -411,6 +442,15 @@ const RagAgent: React.FC = () => {
     },
   ];
 
+  // Cleanup audio on unmount
+  useEffect(() => {
+    return () => {
+      if (currentAudio) {
+        currentAudio.pause();
+      }
+    };
+  }, [currentAudio]);
+
   return (
     <div className="flex h-screen bg-gradient-to-br from-blue-50 via-white to-indigo-50">
       {/* Conversation Sidebar */}
@@ -468,6 +508,31 @@ const RagAgent: React.FC = () => {
               </div>
             </div>
             <div className="flex items-center gap-2">
+              <Tooltip title={isTTSEnabled ? t("chat.ttsOff") : t("chat.ttsOn")}>
+                <div className="flex items-center gap-2 mr-2">
+                  <SoundOutlined className={isTTSEnabled ? "text-blue-500" : "text-gray-400"} />
+                  <Switch
+                    checked={isTTSEnabled}
+                    onChange={(checked) => {
+                      setIsTTSEnabled(checked);
+                      if (!checked && currentAudio) {
+                        currentAudio.pause();
+                        setCurrentAudio(null);
+                      }
+                    }}
+                    size="small"
+                  />
+                </div>
+              </Tooltip>
+              {isTTSEnabled && (
+                <Select
+                  value={ttsProvider}
+                  onChange={setTtsProvider}
+                  style={{ width: 120 }}
+                  options={ttsProviderOptions}
+                  className="mr-2"
+                />
+              )}
               <Dropdown
                 menu={{ items: headerDropdownItems }}
                 placement="bottomRight"
