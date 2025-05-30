@@ -52,14 +52,6 @@ const LandingPage: React.FC = () => {
             <Button
               type="default"
               size="large"
-              onClick={() => navigate("/ai-combat")}
-              className="text-blue-600 hover:text-blue-700"
-            >
-              AI Combat
-            </Button>
-            <Button
-              type="default"
-              size="large"
               onClick={() => navigate("/assistants")}
               className="text-blue-600 hover:text-blue-700"
             >
