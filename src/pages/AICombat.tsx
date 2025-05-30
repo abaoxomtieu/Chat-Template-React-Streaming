@@ -83,13 +83,13 @@ const AICombat: React.FC = () => {
         setLeftModelName={setLeftModelName}
         rightModelName={rightModelName}
         setRightModelName={setRightModelName}
-        messages={messages}
-        streamingMessage={streamingMessage}
+            messages={messages}
+            streamingMessage={streamingMessage}
         isConversationActive={isConversationActive}
-        agent_ask={agent_ask}
+            agent_ask={agent_ask}
         onBackToSelection={handleBackToSelection}
         onStopConversation={handleStopConversation}
-      />
+          />
     );
   }
 

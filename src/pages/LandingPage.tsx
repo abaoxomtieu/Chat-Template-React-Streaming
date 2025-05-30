@@ -3,7 +3,7 @@ import { Button } from "antd";
 import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import LanguageSwitcher from "../components/LanguageSwitcher";
-import { PlusOutlined } from "@ant-design/icons";
+import { PlusOutlined, FacebookOutlined, InstagramOutlined, MailOutlined, PhoneOutlined } from "@ant-design/icons";
 
 // AI Combat arena styles
 const combatStyles = `
@@ -58,10 +58,47 @@ const LandingPage: React.FC = () => {
       <header className="bg-white/90 backdrop-blur-sm shadow-sm">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
           <div className="flex justify-between items-center">
-            <div className="flex items-center">
-              <h1 className="text-2xl font-bold text-gray-900">ABAOXOMTIEU</h1>
-            </div>
             <div className="flex items-center gap-4">
+              <img 
+                src="/src/assets/logo.png" 
+                alt="ABAOXOMTIEU Logo" 
+                className="h-12 w-12 rounded-full object-cover shadow-lg hover:scale-105 transition-transform duration-300"
+              />
+              <h1 className="text-3xl font-bold bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 text-transparent bg-clip-text hover:scale-105 transition-transform duration-300">
+                ABAOXOMTIEU
+              </h1>
+            </div>
+            <div className="flex items-center gap-6">
+              <div className="flex items-center gap-4">
+                <a 
+                  href="https://www.facebook.com/hotonbao" 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  className="text-blue-600 hover:text-blue-800 transition-colors duration-300"
+                >
+                  <FacebookOutlined className="text-2xl" />
+                </a>
+                <a 
+                  href="https://www.instagram.com/abaoxomtieu/" 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  className="text-pink-600 hover:text-pink-800 transition-colors duration-300"
+                >
+                  <InstagramOutlined className="text-2xl" />
+                </a>
+                <a 
+                  href="mailto:htbqn2003@gmail.com"
+                  className="text-red-600 hover:text-red-800 transition-colors duration-300"
+                >
+                  <MailOutlined className="text-2xl" />
+                </a>
+                <a 
+                  href="tel:0949800149"
+                  className="text-green-600 hover:text-green-800 transition-colors duration-300"
+                >
+                  <PhoneOutlined className="text-2xl" />
+                </a>
+              </div>
               <LanguageSwitcher />
               <Button
                 type="primary"
