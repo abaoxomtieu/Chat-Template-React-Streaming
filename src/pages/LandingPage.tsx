@@ -143,7 +143,7 @@ const LandingPage: React.FC = () => {
               type="primary"
               size="large"
               onClick={() => navigate("/ai-combat")}
-              className="combat-btn text-white font-bold border-2 border-yellow-400"
+              className="combat-btn text-white font-bold border-2 border-yellow-400 hover:scale-105 hover:shadow-[0_0_30px_rgba(255,215,0,0.5)] transition-all duration-300"
               style={{
                 background: "linear-gradient(45deg, #ffd700, #ff4500, #8b00ff, #ffd700)",
                 backgroundSize: "400% 400%",
@@ -224,10 +224,9 @@ const LandingPage: React.FC = () => {
               type="primary"
               size="large"
               onClick={() => navigate("/ai-combat")}
-              className="combat-btn text-white text-xl font-bold px-12 py-6 h-auto border-2 border-yellow-400"
+              className="combat-btn text-white font-bold border-2 border-yellow-400 hover:scale-105 hover:shadow-[0_0_30px_rgba(255,215,0,0.5)] transition-all duration-300"
               style={{
-                background:
-                  "linear-gradient(45deg, #ffd700, #ff4500, #8b00ff, #ffd700)",
+                background: "linear-gradient(45deg, #ffd700, #ff4500, #8b00ff, #ffd700)",
                 backgroundSize: "400% 400%",
                 animation: "combat-glow 2s ease-in-out infinite",
               }}
