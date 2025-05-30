@@ -68,7 +68,8 @@ export const sendStreamingRagAgentMessage = async (
   payload: RagAgentPayload,
   onMessage: (message: string) => void,
   onFinal: (data: any) => void,
-  onError: (error: string) => void
+  onError: (error: string) => void,
+  abortSignal?: AbortSignal
 ) => {
   try {
     const response = await fetch(RAG_AGENT_STREAM_URL, {
@@ -77,6 +78,7 @@ export const sendStreamingRagAgentMessage = async (
         "Content-Type": "application/json",
       },
       body: JSON.stringify(payload),
+      signal: abortSignal,
     });
 
     if (!response.ok) {
@@ -92,6 +94,12 @@ export const sendStreamingRagAgentMessage = async (
 
     let buffer = "";
     while (true) {
+      if (abortSignal?.aborted) {
+        console.log("Request aborted, stopping stream reading");
+        reader.cancel();
+        return;
+      }
+
       const { value, done } = await reader.read();
       if (done) break;
 
@@ -103,6 +111,12 @@ export const sendStreamingRagAgentMessage = async (
         if (line.trim()) {
           try {
             const data: RagStreamResponse = JSON.parse(line);
+            
+            if (abortSignal?.aborted) {
+              console.log("Request aborted, stopping message processing");
+              return;
+            }
+            
             switch (data.type) {
               case "message":
                 onMessage(data.content as string);
@@ -121,6 +135,11 @@ export const sendStreamingRagAgentMessage = async (
       }
     }
   } catch (error) {
+    if (error instanceof Error && error.name === 'AbortError') {
+      console.log("Request was aborted");
+      return;
+    }
+    
     console.error("Error in streaming RAG agent:", error);
     onError(error instanceof Error ? error.message : "Unknown error");
   }

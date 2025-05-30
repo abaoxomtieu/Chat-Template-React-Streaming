@@ -48,6 +48,23 @@
     "description": "Create and manage your AI assistants to help with travel planning, destination information, and more.",
     "getStarted": "Get Started",
     "startJourney": "Start Journey",
+    "createAssistant": "Create Assistant",
+    "aiCombat": {
+      "title": "AI COMBAT ARENA",
+      "description": "Witness the ultimate AI showdown! Watch two intelligent chatbots engage in epic conversational battles, showcasing their knowledge, wit, and personality in real-time combat.",
+      "subtitle": "Choose your fighters, set the arena rules, and experience the future of AI entertainment. Who will emerge victorious in this battle of artificial minds?",
+      "enterArena": "ENTER THE ARENA",
+      "leftFighter": "Left Fighter",
+      "rightFighter": "Right Fighter",
+      "features": {
+        "chooseChampions": "Choose Your Champions",
+        "chooseChampionsDesc": "Select from different AI models and personalities to create the perfect fighting duo",
+        "realTimeCombat": "Real-time Combat",
+        "realTimeCombatDesc": "Watch as AIs engage in dynamic conversations with live streaming responses",
+        "epicBattles": "Epic Battles",
+        "epicBattlesDesc": "Experience unlimited conversation rounds until you decide to stop the combat"
+      }
+    },
     "features": {
       "title": "Features",
       "customChatbot": "Custom AI Assistant",

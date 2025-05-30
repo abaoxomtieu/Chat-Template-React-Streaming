@@ -52,6 +52,23 @@
     "description": "Tạo và quản lý các trợ lý AI của bạn để giúp với việc lập kế hoạch du lịch, thông tin điểm đến và hơn thế nữa.",
     "getStarted": "Bắt đầu ngay",
     "startJourney": "Bắt đầu hành trình",
+    "createAssistant": "Tạo trợ lý",
+    "aiCombat": {
+      "title": "ĐẤU TRƯỜNG AI",
+      "description": "Chứng kiến cuộc đối đầu AI tối thượng! Xem hai chatbot thông minh tham gia các trận chiến hội thoại hoành tráng, thể hiện kiến thức, trí tuệ và cá tính trong trận chiến thời gian thực.",
+      "subtitle": "Chọn các chiến binh của bạn, thiết lập luật đấu trường và trải nghiệm tương lai của giải trí AI. Ai sẽ là người chiến thắng trong cuộc chiến của các trí tuệ nhân tạo?",
+      "enterArena": "VÀO ĐẤU TRƯỜNG",
+      "leftFighter": "Chiến binh trái",
+      "rightFighter": "Chiến binh phải",
+      "features": {
+        "chooseChampions": "Chọn nhà vô địch",
+        "chooseChampionsDesc": "Lựa chọn từ các mô hình AI và cá tính khác nhau để tạo ra cặp đôi chiến đấu hoàn hảo",
+        "realTimeCombat": "Chiến đấu thời gian thực",
+        "realTimeCombatDesc": "Xem các AI tham gia cuộc hội thoại động với phản hồi trực tiếp",
+        "epicBattles": "Trận chiến hoành tráng",
+        "epicBattlesDesc": "Trải nghiệm các vòng hội thoại không giới hạn cho đến khi bạn quyết định dừng cuộc chiến"
+      }
+    },
     "features": {
       "title": "Tính năng",
       "customChatbot": "Trợ lý AI tùy chỉnh",

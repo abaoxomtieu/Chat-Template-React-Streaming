@@ -246,12 +246,49 @@ const CustomChatbot: React.FC = () => {
             <div className="text-center py-10">
               <div className="bg-white rounded-xl p-8 shadow-sm border border-gray-100">
                 <RobotOutlined className="text-4xl text-blue-500 mb-4" />
-                <h3 className="text-lg font-medium text-gray-800 mb-2">
-                  {t("customChatbot.welcome.title")}
+                <h3 className="text-xl font-bold text-gray-800 mb-4">
+                  🤖 Trợ Lý Tạo Chatbot
                 </h3>
-                <p className="text-gray-600 mb-6">
-                  {t("customChatbot.welcome.description")}
-                </p>
+                <div className="bg-blue-50 rounded-lg p-6 mb-6 border-l-4 border-blue-500">
+                  <p className="text-gray-700 text-base leading-relaxed mb-4">
+                    <strong>Trợ lý AI này sẽ hỗ trợ bạn tạo ra một chatbot theo yêu cầu của bạn.</strong>
+                  </p>
+                  <p className="text-gray-600 text-sm leading-relaxed">
+                    Bạn hãy trao đổi thông tin với trợ lý này thông qua đoạn chat, nhằm thu thập đủ thông tin cho chatbot mới.
+                  </p>
+                </div>
+                
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-left">
+                  <div className="bg-gradient-to-br from-green-50 to-emerald-50 p-4 rounded-lg border border-green-200">
+                    <div className="flex items-center mb-2">
+                      <span className="text-lg">💡</span>
+                      <h4 className="font-semibold text-green-800 ml-2">Hướng dẫn sử dụng</h4>
+                    </div>
+                    <ul className="text-sm text-green-700 space-y-1">
+                      <li>• Mô tả mục đích chatbot của bạn</li>
+                      <li>• Cung cấp thông tin về đối tượng người dùng</li>
+                      <li>• Chia sẻ yêu cầu tính năng cụ thể</li>
+                    </ul>
+                  </div>
+                  
+                  <div className="bg-gradient-to-br from-purple-50 to-indigo-50 p-4 rounded-lg border border-purple-200">
+                    <div className="flex items-center mb-2">
+                      <span className="text-lg">🎯</span>
+                      <h4 className="font-semibold text-purple-800 ml-2">Ví dụ tạo chatbot</h4>
+                    </div>
+                    <ul className="text-sm text-purple-700 space-y-1">
+                      <li>• Chatbot hỗ trợ khách hàng</li>
+                      <li>• Chatbot tư vấn sản phẩm</li>
+                      <li>• Chatbot giáo dục</li>
+                    </ul>
+                  </div>
+                </div>
+                
+                <div className="mt-6 p-4 bg-yellow-50 rounded-lg border border-yellow-200">
+                  <p className="text-sm text-yellow-800">
+                    <span className="font-semibold">💬 Bắt đầu:</span> Hãy nhập câu hỏi hoặc mô tả chatbot bạn muốn tạo vào ô chat bên dưới!
+                  </p>
+                </div>
               </div>
             </div>
           ) : (
