@@ -5,6 +5,7 @@ import ChatbotEditor from "./pages/ChatbotEditor";
 import CustomChatbot from "./pages/CustomChatbot";
 import LandingPage from "./pages/LandingPage";
 import DocumentManagement from './pages/DocumentManagement';
+import AICombat from './pages/AICombat';
 
 function App() {
   return (
@@ -16,6 +17,7 @@ function App() {
         <Route path="/chatbot-editor/:botId" element={<ChatbotEditor />} />
         <Route path="/create-prompt" element={<CustomChatbot />} />
         <Route path="/documents" element={<DocumentManagement />} />
+        <Route path="/ai-combat" element={<AICombat />} />
       </Routes>
     </Router>
   );

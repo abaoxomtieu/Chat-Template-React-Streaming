@@ -103,7 +103,6 @@ export const sendStreamingRagAgentMessage = async (
         if (line.trim()) {
           try {
             const data: RagStreamResponse = JSON.parse(line);
-            console.log("Stream data:", data);
             switch (data.type) {
               case "message":
                 onMessage(data.content as string);
