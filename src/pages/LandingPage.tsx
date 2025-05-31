@@ -60,7 +60,7 @@ const LandingPage: React.FC = () => {
           <div className="flex justify-between items-center">
             <div className="flex items-center gap-4">
               <img 
-                src="/src/assets/logo.png" 
+                src="./src/assets/logo.png" 
                 alt="ABAOXOMTIEU Logo" 
                 className="h-12 w-12 rounded-full object-cover shadow-lg hover:scale-105 transition-transform duration-300"
               />
